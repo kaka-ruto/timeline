@@ -30,7 +30,9 @@ const { activePath, pageTitle, pageDescription } = Astro.props;
               href={item.href}
               class:list={[
                 "block rounded-full px-3 py-2 text-center text-xs font-medium",
-                activePath === item.href ? "bg-zinc-100 text-black" : "text-zinc-300"
+                activePath === item.href
+                  ? "bg-sky-500 text-white"
+                  : "text-zinc-300 hover:bg-zinc-900/80 hover:text-zinc-100"
               ]}
             >
               {item.label}

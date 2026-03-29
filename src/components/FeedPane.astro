@@ -1,5 +1,6 @@
 ---
 import type { FeedItem } from "../data/site";
+import { profile } from "../data/site";
 
 const { title, subtitle, items } = Astro.props as {
   title: string;
@@ -29,7 +30,18 @@ const tabs = [
         </a>
       ))}
     </div>
-  </header>
+</header>
+
+  <section class="border-b border-zinc-800 px-4 py-4 lg:hidden">
+    <div class="flex items-start gap-3">
+      <img src={profile.avatar} alt={profile.name} class="h-12 w-12 rounded-full object-cover" />
+      <div>
+        <p class="text-sm font-semibold text-zinc-100">{profile.name}</p>
+        <p class="text-xs text-zinc-400">{profile.role}</p>
+        <p class="mt-2 text-sm leading-6 text-zinc-300">{profile.bio}</p>
+      </div>
+    </div>
+  </section>
 
   <div>
     {items.map((item) => (

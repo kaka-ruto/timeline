@@ -17,8 +17,9 @@ export type FeedItem = {
 export const profile = {
   name: "Kaka Ruto",
   handle: "@kaka-ruto",
-  role: "Product Engineer",
-  location: "Wrexham, Wales, UK",
+  role: "Applied AI Software Engineer",
+  location: "Liverpool, England, UK",
+  bio: "Applied AI software engineer building practical products from idea to production.",
   avatar: "/profile/avatar.jpg",
   resumeUrl: "/profile/KakaRutoResume.pdf",
   website: "https://kakaruto.com",
