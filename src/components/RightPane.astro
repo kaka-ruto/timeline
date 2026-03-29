@@ -25,11 +25,9 @@ import { githubConfig, profile } from "../data/site";
 
     const toLabel = (event) => {
       if (event.type === "PushEvent") {
-        const pushes = event.pushCount ?? 1;
         const commits = event.commitCount ?? 0;
         if (commits > 0) return `Pushed ${pluralize(commits, "commit", "commits")} to ${event.repo}`;
-        if (pushes > 1) return `Pushed updates to ${event.repo} (${pluralize(pushes, "push", "pushes")})`;
-        return `Pushed updates to ${event.repo}`;
+        return `Pushed commits to ${event.repo}`;
       }
       if (event.type === "PullRequestEvent") {
         const action = String(event.action || "").toLowerCase();
@@ -95,34 +93,48 @@ import { githubConfig, profile } from "../data/site";
       const textWrap = document.createElement("div");
       textWrap.className = "min-w-0";
       textWrap.append(titleLink, date);
+
+      if (event.type === "PushEvent" && Array.isArray(event.commits) && event.commits.length > 0) {
+        const commitList = document.createElement("ul");
+        commitList.className = "mt-2 space-y-1 text-xs text-zinc-400";
+
+        for (const commit of event.commits) {
+          const commitItem = document.createElement("li");
+          const commitLink = document.createElement("a");
+          commitLink.className = "inline-flex items-center gap-2 hover:text-zinc-200";
+          commitLink.href = commit.url;
+          commitLink.target = "_blank";
+          commitLink.rel = "noreferrer";
+          commitLink.textContent = `${commit.sha} ${commit.message}`;
+          commitItem.append(commitLink);
+          commitList.append(commitItem);
+        }
+
+        if (event.commitCount > event.commits.length && event.compareUrl) {
+          const moreItem = document.createElement("li");
+          const moreLink = document.createElement("a");
+          const remaining = event.commitCount - event.commits.length;
+          moreLink.className = "text-sky-400 hover:text-sky-300";
+          moreLink.href = event.compareUrl;
+          moreLink.target = "_blank";
+          moreLink.rel = "noreferrer";
+          moreLink.textContent = `+${remaining} more commit${remaining === 1 ? "" : "s"}`;
+          moreItem.append(moreLink);
+          commitList.append(moreItem);
+        }
+
+        textWrap.append(commitList);
+      }
+
       row.append(accent, textWrap);
       item.append(row);
       return item;
     };
 
-    const summarizeEvents = (events) => {
-      const summarized = [];
-      for (const event of events) {
-        const prev = summarized[summarized.length - 1];
-        if (
-          prev &&
-          event.type === "PushEvent" &&
-          prev.type === "PushEvent" &&
-          event.repo === prev.repo
-        ) {
-          prev.pushCount = (prev.pushCount ?? 1) + 1;
-          prev.commitCount = Number(prev.commitCount ?? 0) + Number(event.commitCount ?? 0);
-          continue;
-        }
-        summarized.push({ ...event, pushCount: 1 });
-      }
-      return summarized;
-    };
-
     fetch(endpoint)
       .then((response) => response.ok ? response.json() : Promise.reject())
       .then((payload) => {
-        const events = summarizeEvents(payload?.events ?? []);
+        const events = payload?.events ?? [];
 
         if (!Array.isArray(events) || events.length === 0) {
           list.innerHTML = '<li class="text-zinc-500">No recent public activity found.</li>';

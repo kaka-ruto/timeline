@@ -13,8 +13,13 @@ type GitHubEvent = {
     name?: string;
   };
   payload?: {
-    commits?: Array<unknown>;
+    commits?: Array<{
+      sha?: string;
+      message?: string;
+    }>;
     action?: string;
+    before?: string;
+    head?: string;
     pull_request?: {
       html_url?: string;
     };
@@ -33,6 +38,12 @@ type ActivityItem = {
   commitCount: number;
   action: string;
   url: string | null;
+  commits: Array<{
+    sha: string;
+    message: string;
+    url: string;
+  }>;
+  compareUrl: string | null;
 };
 
 const MAX_LIMIT = 10;
@@ -62,6 +73,28 @@ const eventUrl = (event: GitHubEvent): string | null => {
   return null;
 };
 
+const compareUrl = (event: GitHubEvent): string | null => {
+  const repo = event.repo?.name;
+  const before = event.payload?.before;
+  const head = event.payload?.head;
+  if (!repo || !before || !head) return null;
+  return `https://github.com/${repo}/compare/${before}...${head}`;
+};
+
+const commitItems = (event: GitHubEvent) => {
+  const repo = event.repo?.name;
+  if (!repo || !Array.isArray(event.payload?.commits)) return [];
+  return event.payload.commits.slice(0, 3).map((commit) => {
+    const sha = String(commit.sha ?? "").slice(0, 7);
+    const message = String(commit.message ?? "Commit").split("\n")[0];
+    return {
+      sha,
+      message,
+      url: `https://github.com/${repo}/commit/${commit.sha ?? ""}`
+    };
+  });
+};
+
 const toAction = (event: GitHubEvent): string => {
   if (event.type === "PushEvent") return "pushed commits";
   if (event.type === "PullRequestEvent") return event.payload?.action ?? "updated pull request";
@@ -77,7 +110,9 @@ const toItem = (event: GitHubEvent): ActivityItem => ({
   createdAt: event.created_at,
   commitCount: Array.isArray(event.payload?.commits) ? event.payload.commits.length : 0,
   action: toAction(event),
-  url: eventUrl(event)
+  url: eventUrl(event),
+  commits: commitItems(event),
+  compareUrl: compareUrl(event)
 });
 
 const redactedPrivateSummary = (events: GitHubEvent[]) => {
