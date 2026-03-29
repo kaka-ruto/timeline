@@ -29,6 +29,16 @@ type GitHubEvent = {
   };
 };
 
+type CompareResponse = {
+  total_commits?: number;
+  commits?: Array<{
+    sha?: string;
+    commit?: {
+      message?: string;
+    };
+  }>;
+};
+
 type ActivityItem = {
   id: string;
   type: string;
@@ -102,6 +112,54 @@ const toAction = (event: GitHubEvent): string => {
   return event.type.replace("Event", "").toLowerCase();
 };
 
+const buildHeaders = (token?: string): Record<string, string> => {
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github+json",
+    "User-Agent": "kakaruto.com-portfolio"
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+};
+
+const enrichPushEvents = async (events: GitHubEvent[], token?: string): Promise<GitHubEvent[]> => {
+  const headers = buildHeaders(token);
+
+  return Promise.all(
+    events.map(async (event) => {
+      if (event.type !== "PushEvent") return event;
+      const existing = event.payload?.commits ?? [];
+      if (existing.length > 0) return event;
+
+      const repo = event.repo?.name;
+      const before = event.payload?.before;
+      const head = event.payload?.head;
+      if (!repo || !before || !head) return event;
+
+      try {
+        const response = await fetch(`https://api.github.com/repos/${repo}/compare/${before}...${head}`, {
+          headers
+        });
+        if (!response.ok) return event;
+        const compare = (await response.json()) as CompareResponse;
+        const commits = (compare.commits ?? []).map((commit) => ({
+          sha: commit.sha,
+          message: commit.commit?.message ?? "Commit"
+        }));
+
+        return {
+          ...event,
+          payload: {
+            ...event.payload,
+            commits
+          }
+        };
+      } catch {
+        return event;
+      }
+    })
+  );
+};
+
 const toItem = (event: GitHubEvent): ActivityItem => ({
   id: event.id,
   visibility: "public",
@@ -139,10 +197,7 @@ const publicItems = (events: GitHubEvent[], limit: number): ActivityItem[] =>
 
 const fetchPublicEvents = async (username: string) => {
   const response = await fetch(`https://api.github.com/users/${username}/events/public?per_page=${FETCH_LIMIT}`, {
-    headers: {
-      Accept: "application/vnd.github+json",
-      "User-Agent": "kakaruto.com-portfolio"
-    }
+    headers: buildHeaders()
   });
 
   if (!response.ok) {
@@ -157,12 +212,7 @@ const fetchGitHubEvents = async (username: string, token?: string) => {
     return fetchPublicEvents(username);
   }
 
-  const headers: Record<string, string> = {
-    Accept: "application/vnd.github+json",
-    "User-Agent": "kakaruto.com-portfolio"
-  };
-
-  headers.Authorization = `Bearer ${token}`;
+  const headers = buildHeaders(token);
 
   const response = await fetch(`https://api.github.com/user/events?per_page=${FETCH_LIMIT}`, { headers });
   if (!response.ok) {
@@ -196,7 +246,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
       }
     }
 
-    const events = await fetchGitHubEvents(username, token);
+    const rawEvents = await fetchGitHubEvents(username, token);
+    const events = await enrichPushEvents(rawEvents, token);
     const payload = {
       events: publicItems(events, limit),
       privateSummary: redactedPrivateSummary(events),
