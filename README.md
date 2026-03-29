@@ -45,8 +45,10 @@ src/
     writing/index.astro
     about/index.astro
 public/
-  assets/
+  profile/
     avatar.jpg
+    kaka.jpeg
+    KakaRutoResume.pdf
 ```
 
 ## Editing Content
