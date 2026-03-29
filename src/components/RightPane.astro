@@ -88,6 +88,17 @@ import { githubConfig, profile } from "../data/site";
       textWrap.className = "min-w-0 flex-1 pr-2";
       textWrap.append(titleLink);
 
+      if (event.detail) {
+        const detail = document.createElement("p");
+        detail.className = "mt-1 text-xs leading-5 text-zinc-400";
+        detail.textContent = event.detail;
+        detail.style.display = "-webkit-box";
+        detail.style.webkitLineClamp = "2";
+        detail.style.webkitBoxOrient = "vertical";
+        detail.style.overflow = "hidden";
+        textWrap.append(detail);
+      }
+
       if (event.type === "PushEvent" && Array.isArray(event.commits) && event.commits.length > 0) {
         const commitList = document.createElement("ul");
         commitList.className = "mt-2 space-y-1 text-xs text-zinc-400";

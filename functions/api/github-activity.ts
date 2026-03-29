@@ -21,9 +21,21 @@ type GitHubEvent = {
     before?: string;
     head?: string;
     pull_request?: {
+      title?: string;
+      body?: string;
       html_url?: string;
     };
     issue?: {
+      title?: string;
+      body?: string;
+      html_url?: string;
+    };
+    comment?: {
+      body?: string;
+      html_url?: string;
+    };
+    review?: {
+      body?: string;
       html_url?: string;
     };
   };
@@ -54,6 +66,7 @@ type ActivityItem = {
     url: string;
   }>;
   compareUrl: string | null;
+  detail: string | null;
 };
 
 const MAX_LIMIT = 10;
@@ -103,6 +116,45 @@ const commitItems = (event: GitHubEvent) => {
       url: `https://github.com/${repo}/commit/${commit.sha ?? ""}`
     };
   });
+};
+
+const compact = (value?: string) =>
+  String(value ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const detailFor = (event: GitHubEvent): string | null => {
+  if (event.type === "PullRequestEvent") {
+    const title = compact(event.payload?.pull_request?.title);
+    if (title) return title;
+    return compact(event.payload?.pull_request?.body) || null;
+  }
+
+  if (event.type === "IssuesEvent") {
+    const title = compact(event.payload?.issue?.title);
+    if (title) return title;
+    return compact(event.payload?.issue?.body) || null;
+  }
+
+  if (event.type === "IssueCommentEvent") {
+    const body = compact(event.payload?.comment?.body);
+    if (body) return body;
+    return compact(event.payload?.issue?.title) || null;
+  }
+
+  if (event.type === "PullRequestReviewCommentEvent") {
+    const body = compact(event.payload?.comment?.body);
+    if (body) return body;
+    return compact(event.payload?.pull_request?.title) || null;
+  }
+
+  if (event.type === "PullRequestReviewEvent") {
+    const body = compact(event.payload?.review?.body);
+    if (body) return body;
+    return compact(event.payload?.pull_request?.title) || null;
+  }
+
+  return null;
 };
 
 const toAction = (event: GitHubEvent): string => {
@@ -170,7 +222,8 @@ const toItem = (event: GitHubEvent): ActivityItem => ({
   action: toAction(event),
   url: eventUrl(event),
   commits: commitItems(event),
-  compareUrl: compareUrl(event)
+  compareUrl: compareUrl(event),
+  detail: detailFor(event)
 });
 
 const redactedPrivateSummary = (events: GitHubEvent[]) => {
