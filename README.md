@@ -22,6 +22,17 @@ npm install
 npm run dev
 ```
 
+## Local Production-Parity Development (Recommended)
+Run the site the same way Cloudflare Pages runs it (including Functions):
+```bash
+cp .dev.vars.example .dev.vars
+# edit .dev.vars with your real GITHUB_ACTIVITY_TOKEN
+npm install
+npm run dev:pages
+```
+
+This uses `wrangler pages dev dist`, so `/api/github-activity` behaves like production.
+
 ## Build
 ```bash
 npm run build
