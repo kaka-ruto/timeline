@@ -66,7 +66,14 @@ Server endpoint: `functions/api/contact.ts`
 Set these environment variables in Cloudflare Pages project settings:
 - `CONTACT_FORWARD_TO`: your Cloudflare Email Routing alias (for example `contact@kakaruto.com`)
 - `CONTACT_FROM` (optional): sender address for outgoing form notifications (default: `contact.form@kakaruto.com`)
-- `GITHUB_ACTIVITY_TOKEN` (optional): GitHub token used server-side for right-pane activity API (recommended to avoid stricter unauthenticated rate limits)
+- `GITHUB_ACTIVITY_TOKEN` (optional but recommended): GitHub token used server-side for right-pane activity API (enables private activity summary and avoids strict unauthenticated rate limits)
+
+For 10-minute activity caching:
+1. Create a Cloudflare KV namespace (for example `github-activity-cache`).
+2. In Pages project settings, add a KV binding:
+   - Variable name: `GITHUB_ACTIVITY_CACHE`
+   - Namespace: `github-activity-cache`
+3. Redeploy.
 
 Recommended Cloudflare setup:
 1. In Email Routing, create alias `contact@kakaruto.com` forwarding to your private inbox.
