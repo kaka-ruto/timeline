@@ -16,13 +16,13 @@ export type FeedItem = {
 
 export const profile = {
   name: "Kaka Ruto",
-  handle: "@kakaruto",
+  handle: "@kaka-ruto",
   role: "Product Engineer",
   location: "Wrexham, Wales, UK",
   avatar: "/profile/avatar.jpg",
   resumeUrl: "/profile/KakaRutoResume.pdf",
   website: "https://kakaruto.com",
-  github: "https://github.com/kakaruto",
+  github: "https://github.com/kaka-ruto",
   linkedin: "https://www.linkedin.com/in/kakaruto/",
   x: "https://x.com/kakaruto"
 };
@@ -42,7 +42,7 @@ export const nowStatus = {
 };
 
 export const githubConfig = {
-  username: "kakaruto",
+  username: "kaka-ruto",
   eventsLimit: 5
 };
 

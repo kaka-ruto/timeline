@@ -102,21 +102,38 @@ const publicItems = (events: GitHubEvent[], limit: number): ActivityItem[] =>
     .slice(0, limit)
     .map(toItem);
 
+const fetchPublicEvents = async (username: string) => {
+  const response = await fetch(`https://api.github.com/users/${username}/events/public?per_page=${FETCH_LIMIT}`, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      "User-Agent": "kakaruto.com-portfolio"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitHub public events unavailable: ${response.status}`);
+  }
+
+  return (await response.json()) as GitHubEvent[];
+};
+
 const fetchGitHubEvents = async (username: string, token?: string) => {
+  if (!token) {
+    return fetchPublicEvents(username);
+  }
+
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
     "User-Agent": "kakaruto.com-portfolio"
   };
 
-  if (token) headers.Authorization = `Bearer ${token}`;
+  headers.Authorization = `Bearer ${token}`;
 
-  const endpoint = token
-    ? `https://api.github.com/user/events?per_page=${FETCH_LIMIT}`
-    : `https://api.github.com/users/${username}/events/public?per_page=${FETCH_LIMIT}`;
-
-  const response = await fetch(endpoint, { headers });
+  const response = await fetch(`https://api.github.com/user/events?per_page=${FETCH_LIMIT}`, { headers });
   if (!response.ok) {
-    throw new Error(`GitHub API unavailable: ${response.status}`);
+    // Fine-grained token permissions or endpoint access may block private activity.
+    // In that case, gracefully fall back to public events instead of breaking the widget.
+    return fetchPublicEvents(username);
   }
 
   const events = (await response.json()) as GitHubEvent[];
