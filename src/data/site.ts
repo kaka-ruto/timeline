@@ -19,7 +19,6 @@ export const profile = {
   handle: "@kakaruto",
   role: "Product Engineer",
   location: "Wrexham, Wales, UK",
-  email: "kr@kakaruto.com",
   avatar: "/assets/avatar.jpg",
   resumeUrl: "https://raw.githubusercontent.com/kaka-ruto/timeline/master/KakaRutoResume.pdf",
   website: "https://kakaruto.com",
