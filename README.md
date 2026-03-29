@@ -31,7 +31,7 @@ npm install
 npm run dev:pages
 ```
 
-This uses `wrangler pages dev dist`, so `/api/github-activity` behaves like production.
+This uses `wrangler@3.90.0 pages dev dist`, so `/api/github-activity` behaves like production.
 Wrangler will print a local URL (typically `http://localhost:8788`) - open that URL in your browser.
 
 ## Build
