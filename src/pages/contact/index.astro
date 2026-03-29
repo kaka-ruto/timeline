@@ -2,126 +2,75 @@
 import AppShell from "../../layouts/AppShell.astro";
 ---
 
-<AppShell activePath="/contact" pageTitle="Contact | Kaka Ruto" pageDescription="Smart and playful direct contact page for Kaka Ruto.">
-  <section class="relative min-h-screen overflow-hidden border-x border-zinc-800 bg-black/95 px-5 py-8 pb-20 lg:pb-8">
-    <div class="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-sky-500/15 blur-3xl"></div>
-    <div class="pointer-events-none absolute -right-16 bottom-10 h-64 w-64 rounded-full bg-cyan-400/10 blur-3xl"></div>
-
-    <div class="relative z-10 mx-auto max-w-2xl">
-      <p class="inline-block rounded-full border border-sky-400/40 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sky-300">
-        Contact Mission Control
-      </p>
-      <h2 class="mt-4 text-3xl font-black leading-tight text-zinc-50">
-        Send a smart message,
-        <span class="text-sky-400">not a boring one.</span>
-      </h2>
+<AppShell activePath="/contact" pageTitle="Contact | Kaka Ruto" pageDescription="How to send a strong cold email to Kaka Ruto.">
+  <section class="min-h-screen border-x border-zinc-800 bg-black/95 px-5 py-8 pb-20 lg:pb-8">
+    <div class="mx-auto max-w-2xl">
+      <h2 class="text-3xl font-black leading-tight text-zinc-50">Contact</h2>
       <p class="mt-3 text-sm leading-6 text-zinc-300">
-        Pick a message style, auto-generate your draft, then launch it through your mail app.
-        Quick, personal, and no exposed inbox in plain HTML.
+        Knowing how to send a great cold email is a superpower. Also, if your email starts with
+        “Hope this finds you well,” it has already found the archive.
       </p>
 
-      <div class="mt-6 grid gap-3 sm:grid-cols-3">
-        <button type="button" data-template="collab" class="template-btn rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-3 text-left text-sm text-zinc-200 hover:border-sky-500">
-          Build together
-        </button>
-        <button type="button" data-template="hire" class="template-btn rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-3 text-left text-sm text-zinc-200 hover:border-sky-500">
-          Hire / contract
-        </button>
-        <button type="button" data-template="chat" class="template-btn rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-3 text-left text-sm text-zinc-200 hover:border-sky-500">
-          Quick chat
-        </button>
+      <div class="mt-6 rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
+        <h3 class="text-lg font-bold text-zinc-100">The best emails:</h3>
+        <ul class="mt-3 space-y-3 text-sm text-zinc-300">
+          <li>2-3 sentences, reads like a text.</li>
+          <li>Has one clear ask.</li>
+          <li>Thoughtfully personalized.</li>
+          <li>Punchy subject line.</li>
+          <li>Avoid vague asks like “pick your brain.”</li>
+          <li>Does not look like AI wrote it.</li>
+          <li>No signature.</li>
+        </ul>
       </div>
 
-      <form id="smart-contact" class="mt-6 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-950/90 p-5 backdrop-blur">
-        <div>
-          <label for="fromName" class="mb-1 block text-sm text-zinc-300">Your name</label>
-          <input id="fromName" name="fromName" required maxlength="80" class="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none focus:border-sky-500" />
-        </div>
+      <div class="mt-5 rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
+        <h3 class="text-lg font-bold text-zinc-100">Subject line examples</h3>
+        <ul class="mt-3 space-y-2 text-sm text-zinc-300">
+          <li>“Quick build collaboration idea”</li>
+          <li>“Can you help me ship this in 2 weeks?”</li>
+          <li>“Tiny ask on product architecture”</li>
+        </ul>
+      </div>
 
-        <div>
-          <label for="subject" class="mb-1 block text-sm text-zinc-300">Subject</label>
-          <input id="subject" name="subject" required maxlength="140" class="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none focus:border-sky-500" placeholder="Hello Kaka -" />
-        </div>
+      <div class="mt-5 rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
+        <h3 class="text-lg font-bold text-zinc-100">Mini template</h3>
+        <pre class="mt-3 overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-xs leading-6 text-zinc-300">Hi Kaka - [specific thing I noticed].
 
-        <div>
-          <label for="body" class="mb-1 block text-sm text-zinc-300">Message</label>
-          <textarea id="body" name="body" required rows="8" maxlength="3000" class="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none focus:border-sky-500" placeholder="Share context, goals, timeline, and any links."></textarea>
-        </div>
+I am working on [one-line context].
+Would you be open to [clear ask] this week?</pre>
+      </div>
 
-        <div class="flex flex-wrap items-center gap-3">
-          <button type="submit" class="rounded-full bg-sky-500 px-5 py-2 text-sm font-semibold text-white hover:bg-sky-400">
-            Open email draft
-          </button>
-          <button type="button" id="copy-email" class="rounded-full border border-zinc-700 px-4 py-2 text-sm text-zinc-200 hover:border-zinc-500">
-            Copy email
-          </button>
-          <p id="contact-status" class="text-sm text-zinc-400"></p>
-        </div>
-      </form>
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <button id="copy-email" type="button" class="rounded-full bg-sky-500 px-5 py-2 text-sm font-semibold text-white hover:bg-sky-400">
+          Copy contact email
+        </button>
+        <a id="open-email" class="rounded-full border border-zinc-700 px-5 py-2 text-sm text-zinc-200 hover:border-zinc-500" href="#">
+          Open email app
+        </a>
+        <p id="contact-status" class="text-sm text-zinc-400"></p>
+      </div>
     </div>
 
     <script is:inline>
-      const templates = {
-        collab: {
-          subject: "Collaboration idea",
-          body: "Hi Kaka,\\n\\nI have a collaboration idea around ...\\n\\nContext:\\n- ...\\n\\nWould you be open to exploring this together?"
-        },
-        hire: {
-          subject: "Product engineering opportunity",
-          body: "Hi Kaka,\\n\\nI would like to discuss a contract/full-time opportunity.\\n\\nRole details:\\n- ...\\n\\nTimeline:\\n- ..."
-        },
-        chat: {
-          subject: "Quick intro",
-          body: "Hi Kaka,\\n\\nFound your portfolio and wanted to say hello.\\n\\nWould you be open to a short call next week?"
-        }
-      };
-
       const emailParts = ["contact", "kakaruto", "com"];
-      const email = `${emailParts[0]}@${emailParts[1]}.${emailParts[2]}`;
+      const email = emailParts.join(".");
+      const contactEmail = email.replace(".", "@").replace(".com", ".com");
 
-      const form = document.getElementById("smart-contact");
       const status = document.getElementById("contact-status");
-      const subject = document.getElementById("subject");
-      const body = document.getElementById("body");
-      const fromName = document.getElementById("fromName");
+      const openEmail = document.getElementById("open-email");
+      const subject = encodeURIComponent("Quick idea");
+      const body = encodeURIComponent("Hi Kaka -\\n\\n[Your short, clear message here]\\n");
 
-      document.querySelectorAll(".template-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const key = btn.getAttribute("data-template");
-          const template = templates[key];
-          if (!template) return;
-          subject.value = template.subject;
-          body.value = template.body;
-          status.textContent = "Template loaded. Personalize it and launch.";
-        });
-      });
+      openEmail?.setAttribute("href", `mailto:${contactEmail}?subject=${subject}&body=${body}`);
 
       document.getElementById("copy-email")?.addEventListener("click", async () => {
         try {
-          await navigator.clipboard.writeText(email);
-          status.textContent = `Copied ${email}`;
+          await navigator.clipboard.writeText(contactEmail);
+          status.textContent = `Copied ${contactEmail}`;
         } catch {
-          status.textContent = `Copy failed. Email is ${email}`;
+          status.textContent = `Email: ${contactEmail}`;
         }
-      });
-
-      form?.addEventListener("submit", (event) => {
-        event.preventDefault();
-
-        const name = fromName.value.trim();
-        const mailSubject = subject.value.trim();
-        const mailBody = body.value.trim();
-
-        if (!name || !mailSubject || !mailBody) {
-          status.textContent = "Add your name, subject, and message first.";
-          return;
-        }
-
-        const fullBody = `${mailBody}\\n\\n--\\n${name}`;
-        const href = `mailto:${email}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(fullBody)}`;
-
-        window.location.href = href;
-        status.textContent = "Draft opened in your email app.";
       });
     </script>
   </section>
