@@ -247,7 +247,7 @@ const publicItems = (events: GitHubEvent[], limit: number): ActivityItem[] =>
     .filter((event) => {
       if (event.type !== "PullRequestReviewEvent") return true;
       const reviewBody = compact(event.payload?.review?.body);
-      return reviewBody.length >= 40;
+      return reviewBody.length > 0;
     })
     .filter((event) => event.public !== false)
     .slice(0, limit)
