@@ -49,10 +49,10 @@ import { githubConfig, profile } from "../data/site";
       if (event.type === "PullRequestReviewEvent") return `Left a PR review on ${event.repo}`;
       if (event.type === "WatchEvent") return `Starred ${event.repo}`;
       if (event.type === "ForkEvent") return `Forked ${event.repo}`;
+      if (event.type === "ReleaseEvent") return `Published a release in ${event.repo}`;
       if (event.type === "CreateEvent") return `Created something new in ${event.repo}`;
-      if (event.type === "DeleteEvent") return `Deleted something in ${event.repo}`;
 
-      return `Updated ${event.repo}`;
+      return null;
     };
 
     const toRelative = (value) => {
@@ -73,7 +73,9 @@ import { githubConfig, profile } from "../data/site";
 
       const titleLink = document.createElement("a");
       titleLink.className = "leading-6 text-zinc-200 hover:text-zinc-100";
-      titleLink.textContent = toLabel(event);
+      const label = toLabel(event);
+      if (!label) return null;
+      titleLink.textContent = label;
       if (event.url) {
         titleLink.href = event.url;
         titleLink.target = "_blank";
@@ -146,7 +148,12 @@ import { githubConfig, profile } from "../data/site";
           return;
         }
 
-        list.replaceChildren(...events.slice(0, limit).map(renderEvent));
+        const rendered = events.slice(0, limit).map(renderEvent).filter(Boolean);
+        if (rendered.length === 0) {
+          list.innerHTML = '<li class="text-zinc-500">No recent high-signal activity found.</li>';
+          return;
+        }
+        list.replaceChildren(...rendered);
       })
       .catch(() => {
         list.innerHTML = '<li class="text-zinc-500">Unable to fetch GitHub activity right now.</li>';

@@ -20,6 +20,8 @@ type GitHubEvent = {
     action?: string;
     before?: string;
     head?: string;
+    ref?: string;
+    ref_type?: string;
     pull_request?: {
       title?: string;
       body?: string;
@@ -37,6 +39,12 @@ type GitHubEvent = {
     review?: {
       body?: string;
       html_url?: string;
+    };
+    release?: {
+      name?: string;
+      tag_name?: string;
+      html_url?: string;
+      body?: string;
     };
   };
 };
@@ -90,8 +98,16 @@ const normalizeLimit = (value: string | null) => {
 };
 
 const eventUrl = (event: GitHubEvent): string | null => {
+  if (event.type === "ReleaseEvent") return event.payload?.release?.html_url ?? null;
   if (event.type === "PullRequestEvent") return event.payload?.pull_request?.html_url ?? null;
   if (event.type === "IssuesEvent") return event.payload?.issue?.html_url ?? null;
+  if (event.type === "IssueCommentEvent") return event.payload?.comment?.html_url ?? event.payload?.issue?.html_url ?? null;
+  if (event.type === "PullRequestReviewCommentEvent") {
+    return event.payload?.comment?.html_url ?? event.payload?.pull_request?.html_url ?? null;
+  }
+  if (event.type === "PullRequestReviewEvent") {
+    return event.payload?.review?.html_url ?? event.payload?.pull_request?.html_url ?? null;
+  }
   if (event.repo?.name) return `https://github.com/${event.repo.name}`;
   return null;
 };
@@ -154,7 +170,44 @@ const detailFor = (event: GitHubEvent): string | null => {
     return compact(event.payload?.pull_request?.title) || null;
   }
 
+  if (event.type === "ReleaseEvent") {
+    const releaseName = compact(event.payload?.release?.name);
+    if (releaseName) return releaseName;
+    const tag = compact(event.payload?.release?.tag_name);
+    if (tag) return tag;
+    return compact(event.payload?.release?.body) || null;
+  }
+
+  if (event.type === "CreateEvent") {
+    const refType = compact(event.payload?.ref_type);
+    const ref = compact(event.payload?.ref);
+    if (refType && ref) return `${refType}: ${ref}`;
+    return ref || null;
+  }
+
   return null;
+};
+
+const isMeaningfulEvent = (event: GitHubEvent): boolean => {
+  const allowed = new Set([
+    "PushEvent",
+    "PullRequestEvent",
+    "IssuesEvent",
+    "IssueCommentEvent",
+    "PullRequestReviewCommentEvent",
+    "PullRequestReviewEvent",
+    "ReleaseEvent",
+    "WatchEvent",
+    "ForkEvent",
+    "CreateEvent"
+  ]);
+
+  if (!allowed.has(event.type)) return false;
+  if (event.type === "PullRequestReviewEvent") {
+    return compact(event.payload?.review?.body).length > 0;
+  }
+
+  return true;
 };
 
 const toAction = (event: GitHubEvent): string => {
@@ -244,11 +297,7 @@ const redactedPrivateSummary = (events: GitHubEvent[]) => {
 
 const publicItems = (events: GitHubEvent[], limit: number): ActivityItem[] =>
   events
-    .filter((event) => {
-      if (event.type !== "PullRequestReviewEvent") return true;
-      const reviewBody = compact(event.payload?.review?.body);
-      return reviewBody.length > 0;
-    })
+    .filter(isMeaningfulEvent)
     .filter((event) => event.public !== false)
     .slice(0, limit)
     .map(toItem);
