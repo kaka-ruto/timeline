@@ -1,0 +1,226 @@
+---
+type BuilderLogItem = {
+  id: string;
+  data: {
+    date: Date;
+    hook: string;
+    action: string;
+    result: string;
+    lesson: string;
+    visibility: "public" | "private";
+    links: { label: string; url: string }[];
+    proofUrl?: string;
+    images: string[];
+  };
+};
+
+const { entries, initialCount = 14, batchSize = 14 } = Astro.props as {
+  entries: BuilderLogItem[];
+  initialCount?: number;
+  batchSize?: number;
+};
+
+const HOME_TIMEZONE = "Africa/Nairobi";
+
+const dayParts = (value: Date) => {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: HOME_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(value);
+
+  return {
+    year: Number(parts.find((part) => part.type === "year")?.value ?? "0"),
+    month: Number(parts.find((part) => part.type === "month")?.value ?? "0"),
+    day: Number(parts.find((part) => part.type === "day")?.value ?? "0")
+  };
+};
+
+const daysAgoText = (value: Date) => {
+  const nowParts = dayParts(new Date());
+  const entryParts = dayParts(value);
+  const nowUtc = Date.UTC(nowParts.year, nowParts.month - 1, nowParts.day);
+  const entryUtc = Date.UTC(entryParts.year, entryParts.month - 1, entryParts.day);
+  const diff = Math.max(0, Math.floor((nowUtc - entryUtc) / 86400000));
+  return `${diff} ${diff === 1 ? "day" : "days"} ago`;
+};
+
+const sentenceFromHARL = (entry: BuilderLogItem, index: number) => {
+  const { hook, action, result, lesson } = entry.data;
+  const templates = [
+    `${hook}. ${action} ${result} ${lesson}`,
+    `${hook}. I focused on ${action.charAt(0).toLowerCase()}${action.slice(1)} ${result} ${lesson}`,
+    `${hook}. ${action} That led to this outcome: ${result} ${lesson}`
+  ];
+  return templates[index % templates.length];
+};
+---
+
+<section class="min-h-screen border-x border-zinc-800 bg-black/95 pb-20 lg:pb-0">
+  <header class="sticky top-0 z-10 border-b border-zinc-800 bg-black/80 px-4 py-3 backdrop-blur">
+    <h2 class="text-xl font-bold text-zinc-50">Kaka's Build Desk</h2>
+    <p class="text-sm text-zinc-400">Small daily shipping notes, told like a timeline.</p>
+  </header>
+
+  <div id="builder-log-list">
+    {
+      entries.map((entry, index) => (
+        <article
+          class:list={[
+            "border-b border-zinc-800 px-4 py-5 transition hover:bg-zinc-950/80",
+            index >= initialCount ? "hidden" : ""
+          ]}
+          data-log-item
+        >
+          <div class="flex items-center justify-between text-xs">
+            <time class="font-medium text-emerald-400" datetime={entry.data.date.toISOString()}>{daysAgoText(entry.data.date)}</time>
+            <span class="text-zinc-500">{entry.data.visibility === "public" ? "Public" : "Private"}</span>
+          </div>
+
+          <p class="mt-3 text-[15px] leading-7 text-zinc-200">{sentenceFromHARL(entry, index)}</p>
+
+          {entry.data.visibility === "public" && (entry.data.links.length > 0 || entry.data.proofUrl) && (
+            <div class="mt-4 space-y-2 text-sm text-sky-400">
+              {entry.data.links.map((link) => (
+                <a href={link.url} target="_blank" rel="noreferrer" class="block break-all hover:text-sky-300">
+                  {link.url}
+                </a>
+              ))}
+              {entry.data.proofUrl && (
+                <a href={entry.data.proofUrl} target="_blank" rel="noreferrer" class="block break-all hover:text-sky-300">
+                  {entry.data.proofUrl}
+                </a>
+              )}
+            </div>
+          )}
+
+          {entry.data.images.length > 0 && (
+            <div class="mt-5 grid gap-2 sm:grid-cols-2">
+              {[...new Set(entry.data.images)].slice(0, 4).map((imagePath, imageIndex, imageList) => (
+                <button
+                  type="button"
+                  class="cursor-zoom-in"
+                  data-gallery-open
+                  data-gallery-images={JSON.stringify(imageList)}
+                  data-gallery-index={String(imageIndex)}
+                  data-gallery-title={entry.data.hook}
+                >
+                  <img src={imagePath} alt={entry.data.hook} class="h-44 w-full rounded-xl object-cover" loading="lazy" />
+                </button>
+              ))}
+            </div>
+          )}
+        </article>
+      ))
+    }
+  </div>
+
+  <div id="builder-log-sentinel" class="h-20"></div>
+</section>
+
+<dialog id="builder-log-lightbox" class="m-0 h-full w-full max-h-none max-w-none border-0 bg-black/90 p-0">
+  <div class="flex h-full w-full items-center justify-center px-4 py-8">
+    <button
+      type="button"
+      id="lightbox-close"
+      aria-label="Close image viewer"
+      class="absolute right-4 top-4 rounded-full border border-zinc-700 px-3 py-1 text-sm text-zinc-200 hover:border-zinc-500"
+    >
+      Close
+    </button>
+    <button
+      type="button"
+      id="lightbox-prev"
+      aria-label="Previous image"
+      class="absolute left-4 rounded-full border border-zinc-700 px-3 py-1 text-sm text-zinc-200 hover:border-zinc-500"
+    >
+      Prev
+    </button>
+    <img id="lightbox-image" src="" alt="" class="max-h-full max-w-full rounded-xl object-contain" />
+    <button
+      type="button"
+      id="lightbox-next"
+      aria-label="Next image"
+      class="absolute right-4 rounded-full border border-zinc-700 px-3 py-1 text-sm text-zinc-200 hover:border-zinc-500"
+    >
+      Next
+    </button>
+    <p id="lightbox-caption" class="absolute bottom-4 text-sm text-zinc-300"></p>
+  </div>
+</dialog>
+
+<script is:inline define:vars={{ initialCount, batchSize }}>
+  const items = Array.from(document.querySelectorAll("[data-log-item]"));
+  const sentinel = document.getElementById("builder-log-sentinel");
+
+  let shown = Math.min(initialCount, items.length);
+
+  const revealMore = () => {
+    const next = Math.min(shown + batchSize, items.length);
+    for (let i = shown; i < next; i += 1) {
+      items[i]?.classList.remove("hidden");
+    }
+    shown = next;
+
+    if (shown >= items.length) observer.disconnect();
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const [entry] = entries;
+      if (entry?.isIntersecting) revealMore();
+    },
+    { rootMargin: "220px 0px" }
+  );
+
+  if (sentinel && shown < items.length) {
+    observer.observe(sentinel);
+  }
+
+  const lightbox = document.getElementById("builder-log-lightbox");
+  const lightboxImage = document.getElementById("lightbox-image");
+  const lightboxCaption = document.getElementById("lightbox-caption");
+  const closeBtn = document.getElementById("lightbox-close");
+  const prevBtn = document.getElementById("lightbox-prev");
+  const nextBtn = document.getElementById("lightbox-next");
+  const triggers = Array.from(document.querySelectorAll("[data-gallery-open]"));
+
+  let activeImages = [];
+  let activeIndex = 0;
+  let activeTitle = "";
+
+  const paintLightbox = () => {
+    const src = activeImages[activeIndex];
+    if (!src || !lightboxImage || !lightboxCaption) return;
+    lightboxImage.src = src;
+    lightboxImage.alt = activeTitle;
+    lightboxCaption.textContent = `${activeTitle} (${activeIndex + 1}/${activeImages.length})`;
+  };
+
+  triggers.forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      activeImages = JSON.parse(trigger.getAttribute("data-gallery-images") || "[]");
+      activeIndex = Number(trigger.getAttribute("data-gallery-index") || "0");
+      activeTitle = trigger.getAttribute("data-gallery-title") || "Builder log image";
+      paintLightbox();
+      lightbox?.showModal();
+    });
+  });
+
+  closeBtn?.addEventListener("click", () => lightbox?.close());
+  prevBtn?.addEventListener("click", () => {
+    if (activeImages.length <= 1) return;
+    activeIndex = (activeIndex - 1 + activeImages.length) % activeImages.length;
+    paintLightbox();
+  });
+  nextBtn?.addEventListener("click", () => {
+    if (activeImages.length <= 1) return;
+    activeIndex = (activeIndex + 1) % activeImages.length;
+    paintLightbox();
+  });
+
+  lightbox?.addEventListener("click", (event) => {
+    if (event.target === lightbox) lightbox.close();
+  });
+</script>

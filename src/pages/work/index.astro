@@ -1,0 +1,16 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+import { about } from "../../data/site";
+---
+
+<AppShell activePath="/work" pageTitle="Work | Kaka Ruto" pageDescription="Work experience and highlights by Kaka Ruto.">
+  <section class="min-h-screen border-x border-zinc-800 bg-black/95 px-5 py-8 pb-20 lg:pb-8">
+    <h2 class="text-2xl font-bold text-zinc-50">Work</h2>
+    <p class="mt-4 max-w-2xl text-zinc-300">{about.intro}</p>
+    <ul class="mt-6 space-y-3">
+      {about.highlights.map((highlight) => (
+        <li class="rounded-xl border border-zinc-800 bg-zinc-950 p-4 text-zinc-200">{highlight}</li>
+      ))}
+    </ul>
+  </section>
+</AppShell>

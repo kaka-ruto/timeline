@@ -1,9 +1,13 @@
 ---
-import FeedPane from "../components/FeedPane.astro";
+import { getCollection } from "astro:content";
+import BuilderLogFeed from "../components/BuilderLogFeed.astro";
 import AppShell from "../layouts/AppShell.astro";
-import { feedItems } from "../data/site";
+
+const builderLogs = (await getCollection("builder-log", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
 ---
 
 <AppShell activePath="/" pageTitle="Kaka Ruto | Portfolio" pageDescription="Product engineer portfolio of Kaka Ruto.">
-  <FeedPane title="Home" subtitle="Product, engineering, and shipping updates" items={feedItems} />
+  <BuilderLogFeed entries={builderLogs} initialCount={14} batchSize={14} />
 </AppShell>
