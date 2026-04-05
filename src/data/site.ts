@@ -20,7 +20,7 @@ export const profile = {
   role: "Applied AI Software Engineer",
   location: "Liverpool, England, UK",
   bio: "Applied AI software engineer building practical products from idea to production.",
-  avatar: "/profile/avatar.jpg",
+  avatar: "/profile/me.jpg",
   resumeUrl: "/profile/KakaRutoResume.pdf",
   website: "https://kakaruto.com",
   github: "https://github.com/kaka-ruto",
