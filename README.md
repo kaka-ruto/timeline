@@ -26,7 +26,7 @@ npm run dev
 Run the site the same way Cloudflare Pages runs it (including Functions):
 ```bash
 cp .dev.vars.example .dev.vars
-# edit .dev.vars with your real GITHUB_ACTIVITY_TOKEN
+# edit .dev.vars with your real GITHUB_TOKEN
 npm install
 npm run dev:pages
 ```
@@ -78,7 +78,7 @@ Server endpoint: `functions/api/contact.ts`
 Set these environment variables in Cloudflare Pages project settings:
 - `CONTACT_FORWARD_TO`: your Cloudflare Email Routing alias (for example `contact@kakaruto.com`)
 - `CONTACT_FROM` (optional): sender address for outgoing form notifications (default: `contact.form@kakaruto.com`)
-- `GITHUB_ACTIVITY_TOKEN` (optional but recommended): GitHub token used server-side for right-pane activity API (enables private activity summary and avoids strict unauthenticated rate limits)
+- `GITHUB_TOKEN` (optional but recommended): GitHub token used server-side for right-pane activity API (helps avoid strict unauthenticated rate limits)
 
 For 10-minute activity caching:
 1. Create a Cloudflare KV namespace (for example `github-activity-cache`).

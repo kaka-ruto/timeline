@@ -9,7 +9,6 @@ const builderLog = defineCollection({
     action: z.string().min(1),
     result: z.string().min(1),
     lesson: z.string().min(1),
-    visibility: z.enum(["public", "private"]).default("public"),
     links: z
       .array(
         z.object({

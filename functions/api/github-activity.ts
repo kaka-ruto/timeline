@@ -1,5 +1,4 @@
 type Env = {
-  GITHUB_ACTIVITY_TOKEN?: string;
   GITHUB_TOKEN?: string;
   GITHUB_ACTIVITY_CACHE?: KVNamespace;
 };
@@ -62,7 +61,7 @@ type CompareResponse = {
 type ActivityItem = {
   id: string;
   type: string;
-  visibility: "public";
+  visibility: "public" | "private";
   repo: string;
   createdAt: string;
   commitCount: number;
@@ -79,6 +78,7 @@ type ActivityItem = {
 
 const MAX_LIMIT = 10;
 const FETCH_LIMIT = 30;
+const COMMIT_LOOKBACK_DAYS = 14;
 const CACHE_TTL_SECONDS = 600;
 const PRIVATE_LABEL = "Private repository";
 
@@ -267,7 +267,7 @@ const enrichPushEvents = async (events: GitHubEvent[], token?: string): Promise<
 
 const toItem = (event: GitHubEvent): ActivityItem => ({
   id: event.id,
-  visibility: "public",
+  visibility: event.public === false ? "private" : "public",
   type: event.type,
   repo: event.repo?.name ?? "Unknown repository",
   createdAt: event.created_at,
@@ -295,10 +295,9 @@ const redactedPrivateSummary = (events: GitHubEvent[]) => {
   };
 };
 
-const publicItems = (events: GitHubEvent[], limit: number): ActivityItem[] =>
+const feedItems = (events: GitHubEvent[], limit: number): ActivityItem[] =>
   events
     .filter(isMeaningfulEvent)
-    .filter((event) => event.public !== false)
     .slice(0, limit)
     .map(toItem);
 
@@ -324,12 +323,74 @@ const fetchGitHubEvents = async (username: string, token?: string) => {
   const response = await fetch(`https://api.github.com/user/events?per_page=${FETCH_LIMIT}`, { headers });
   if (!response.ok) {
     // Fine-grained token permissions or endpoint access may block private activity.
-    // In that case, gracefully fall back to public events instead of breaking the widget.
-    return fetchPublicEvents(username);
+    // In that case, build a mixed public/private activity feed from accessible repo commits.
+    return fetchRepoCommitEvents(username, token);
   }
 
   const events = (await response.json()) as GitHubEvent[];
   return events;
+};
+
+type Repo = {
+  full_name: string;
+  private?: boolean;
+};
+
+type RepoCommit = {
+  sha?: string;
+  commit?: {
+    message?: string;
+    author?: {
+      date?: string;
+    };
+  };
+};
+
+const fetchRepoCommitEvents = async (username: string, token: string): Promise<GitHubEvent[]> => {
+  const headers = buildHeaders(token);
+  const reposResponse = await fetch(
+    "https://api.github.com/user/repos?sort=pushed&direction=desc&per_page=50&type=owner",
+    { headers }
+  );
+
+  if (!reposResponse.ok) {
+    return fetchPublicEvents(username);
+  }
+
+  const repos = ((await reposResponse.json()) as Repo[]).slice(0, 20);
+  const since = new Date(Date.now() - COMMIT_LOOKBACK_DAYS * 24 * 60 * 60 * 1000).toISOString();
+
+  const results = await Promise.all(
+    repos.map(async (repo) => {
+      const commitsResponse = await fetch(
+        `https://api.github.com/repos/${repo.full_name}/commits?author=${encodeURIComponent(username)}&since=${encodeURIComponent(since)}&per_page=2`,
+        { headers }
+      );
+      if (!commitsResponse.ok) return [];
+      const commits = (await commitsResponse.json()) as RepoCommit[];
+
+      return commits
+        .filter((commit) => commit.sha && commit.commit?.author?.date)
+        .map((commit) => ({
+          id: `${repo.full_name}-${commit.sha}`,
+          type: "PushEvent",
+          public: repo.private ? false : true,
+          created_at: commit.commit?.author?.date ?? new Date().toISOString(),
+          repo: { name: repo.full_name },
+          payload: {
+            commits: [
+              {
+                sha: commit.sha,
+                message: commit.commit?.message ?? "Commit"
+              }
+            ],
+            action: "pushed"
+          }
+        }) as GitHubEvent);
+    })
+  );
+
+  return results.flat().sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
 };
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
@@ -341,7 +402,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     return json({ error: "Invalid GitHub username." }, 400);
   }
 
-  const token = env.GITHUB_ACTIVITY_TOKEN ?? env.GITHUB_TOKEN;
+  const token = env.GITHUB_TOKEN;
   const cache = env.GITHUB_ACTIVITY_CACHE;
   const cacheKey = `github-activity:${username}:v1`;
 
@@ -356,7 +417,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     const rawEvents = await fetchGitHubEvents(username, token);
     const events = await enrichPushEvents(rawEvents, token);
     const payload = {
-      events: publicItems(events, limit),
+      events: feedItems(events, limit),
       privateSummary: redactedPrivateSummary(events),
       cachedForSeconds: CACHE_TTL_SECONDS
     };
