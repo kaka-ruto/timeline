@@ -44,7 +44,7 @@ export const nowStatus = {
 
 export const githubConfig = {
   username: "kaka-ruto",
-  eventsLimit: 10
+  eventsLimit: 30
 };
 
 export const feedItems: FeedItem[] = [

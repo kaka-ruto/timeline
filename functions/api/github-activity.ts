@@ -76,7 +76,7 @@ type ActivityItem = {
   detail: string | null;
 };
 
-const MAX_LIMIT = 10;
+const MAX_LIMIT = 30;
 const FETCH_LIMIT = 30;
 const COMMIT_LOOKBACK_DAYS = 90;
 const CACHE_TTL_SECONDS = 600;
