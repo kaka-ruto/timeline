@@ -357,7 +357,7 @@ const fetchReposForActivity = async (token: string): Promise<Repo[]> => {
   const headers = buildHeaders(token);
   const repos: Repo[] = [];
 
-  for (let page = 1; page <= 2; page += 1) {
+  for (let page = 1; page <= 10; page += 1) {
     const response = await fetch(
       `https://api.github.com/user/repos?sort=pushed&direction=desc&per_page=50&page=${page}&affiliation=owner,collaborator,organization_member`,
       { headers }
@@ -419,7 +419,7 @@ const fetchRepoActivity = async (username: string, token: string): Promise<GitHu
 
   const since = new Date(Date.now() - COMMIT_LOOKBACK_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
-  const commitsPromise = fetchRepoCommitEventsForRepos(username, token, repos.slice(0, 20), since);
+  const commitsPromise = fetchRepoCommitEventsForRepos(username, token, repos.slice(0, 50), since);
   const prsPromise = fetchSearchEvents(username, token, "pr", reposIndex);
   const issuesPromise = fetchSearchEvents(username, token, "issue", reposIndex);
 
@@ -545,7 +545,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
   const token = env.GITHUB_TOKEN;
   const cache = env.GITHUB_ACTIVITY_CACHE;
-  const cacheKey = `github-activity:${username}:v3`;
+  const cacheKey = `github-activity:${username}:v4`;
 
   try {
     if (cache) {
