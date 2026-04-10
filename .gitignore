@@ -19,6 +19,9 @@ pnpm-debug.log*
 .dev.vars
 .wrangler/
 
+# automation scratch
+.tmp/
+
 # macOS-specific files
 .DS_Store
 
