@@ -381,6 +381,11 @@ type IssueOrPullRequestSearchItem = {
   updated_at?: string;
   repository_url?: string;
   pull_request?: unknown;
+  number?: number;
+  comments_url?: string;
+  user?: {
+    login?: string;
+  };
 };
 
 type SearchResponse = {
@@ -478,6 +483,51 @@ const fetchRepoCommitEventsForRepos = async (
 const searchUrl = (query: string) =>
   `https://api.github.com/search/issues?q=${encodeURIComponent(query)}&sort=updated&order=desc&per_page=10`;
 
+const maxIsoTime = (a?: string | null, b?: string | null) => {
+  const aValue = a ? Date.parse(a) : Number.NaN;
+  const bValue = b ? Date.parse(b) : Number.NaN;
+  if (Number.isNaN(aValue)) return b ?? null;
+  if (Number.isNaN(bValue)) return a ?? null;
+  return aValue >= bValue ? a ?? null : b ?? null;
+};
+
+const latestIssueCommentAt = async (
+  item: IssueOrPullRequestSearchItem,
+  username: string,
+  headers: Record<string, string>,
+  since: string
+) => {
+  const commentsUrl = item.comments_url;
+  if (!commentsUrl) return null;
+
+  try {
+    const response = await fetch(`${commentsUrl}?per_page=100&since=${encodeURIComponent(since)}`, { headers });
+    if (!response.ok) return null;
+    const comments = (await response.json()) as Array<{ user?: { login?: string }; created_at?: string }>;
+    let latest: string | null = null;
+    for (const comment of comments) {
+      if (comment?.user?.login !== username) continue;
+      latest = maxIsoTime(latest, comment.created_at ?? null);
+    }
+    return latest;
+  } catch {
+    return null;
+  }
+};
+
+const contributionTimestampFor = async (
+  item: IssueOrPullRequestSearchItem,
+  username: string,
+  headers: Record<string, string>,
+  since: string
+) => {
+  // Use the latest *your* comment in the window if available; otherwise fall back to creation time
+  // when you authored the item.
+  const authoredAt = item.user?.login === username ? item.created_at ?? null : null;
+  const commentedAt = await latestIssueCommentAt(item, username, headers, since);
+  return maxIsoTime(authoredAt, commentedAt) ?? item.created_at ?? item.updated_at ?? new Date().toISOString();
+};
+
 const fetchSearchEvents = async (
   username: string,
   token: string,
@@ -485,21 +535,50 @@ const fetchSearchEvents = async (
   reposIndex: Map<string, boolean>
 ): Promise<GitHubEvent[]> => {
   const headers = buildHeaders(token);
-  const query = kind === "pr" ? `involves:${username} type:pr` : `involves:${username} type:issue`;
+  const queries =
+    kind === "pr"
+      ? [`author:${username} type:pr`, `commenter:${username} type:pr`]
+      : [`author:${username} type:issue`, `commenter:${username} type:issue`];
 
-  const response = await fetch(searchUrl(query), { headers });
-  if (!response.ok) return [];
+  const responses = await Promise.all(queries.map((query) => fetch(searchUrl(query), { headers })));
+  const payloads: SearchResponse[] = [];
+  for (const response of responses) {
+    if (!response.ok) continue;
+    try {
+      payloads.push((await response.json()) as SearchResponse);
+    } catch {
+      // ignore malformed payloads
+    }
+  }
 
-  const search = (await response.json()) as SearchResponse;
-  const items = (search.items ?? []).filter((item) => item && item.html_url);
+  const rawItems = payloads.flatMap((payload) => payload.items ?? []);
+  const uniqueItems = new Map<number, IssueOrPullRequestSearchItem>();
+  for (const item of rawItems) {
+    if (!item?.id || !item.html_url) continue;
+    uniqueItems.set(item.id, item);
+  }
 
-  return items.map((item) => {
-    const repoName = repoNameFromUrl(item.repository_url) ?? "Unknown repository";
-    const isPrivate = reposIndex.get(repoName) === true;
-    const createdAt = item.updated_at ?? item.created_at ?? new Date().toISOString();
+  const since = new Date(Date.now() - COMMIT_LOOKBACK_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  const items = Array.from(uniqueItems.values());
 
-    if (kind === "pr") {
-      return {
+  const timestamps = await Promise.all(
+    items.map(async (item) => ({
+      item,
+      contributedAt: await contributionTimestampFor(item, username, headers, since)
+    }))
+  );
+
+  return timestamps
+    .filter(({ contributedAt }) => Boolean(contributedAt))
+    .sort((a, b) => Date.parse(b.contributedAt) - Date.parse(a.contributedAt))
+    .slice(0, 10)
+    .map(({ item, contributedAt }) => {
+      const repoName = repoNameFromUrl(item.repository_url) ?? "Unknown repository";
+      const isPrivate = reposIndex.get(repoName) === true;
+      const createdAt = contributedAt;
+
+      if (kind === "pr") {
+        return {
         id: `pr-${item.id}`,
         type: "PullRequestEvent",
         public: isPrivate ? false : true,
@@ -513,10 +592,10 @@ const fetchSearchEvents = async (
             html_url: item.html_url
           }
         }
-      } as GitHubEvent;
-    }
+        } as GitHubEvent;
+      }
 
-    return {
+      return {
       id: `issue-${item.id}`,
       type: "IssuesEvent",
       public: isPrivate ? false : true,
@@ -530,8 +609,8 @@ const fetchSearchEvents = async (
           html_url: item.html_url
         }
       }
-    } as GitHubEvent;
-  });
+      } as GitHubEvent;
+    });
 };
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
@@ -545,7 +624,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
   const token = env.GITHUB_TOKEN;
   const cache = env.GITHUB_ACTIVITY_CACHE;
-  const cacheKey = `github-activity:${username}:v4`;
+  const cacheKey = `github-activity:${username}:v5`;
 
   try {
     if (cache) {
