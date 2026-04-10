@@ -178,13 +178,6 @@ const detailFor = (event: GitHubEvent): string | null => {
     return compact(event.payload?.release?.body) || null;
   }
 
-  if (event.type === "CreateEvent") {
-    const refType = compact(event.payload?.ref_type);
-    const ref = compact(event.payload?.ref);
-    if (refType && ref) return `${refType}: ${ref}`;
-    return ref || null;
-  }
-
   return null;
 };
 
@@ -277,8 +270,6 @@ const PRIVATE_REPO_NAME = "a private repo";
 
 const toItem = (event: GitHubEvent): ActivityItem => {
   const isPrivate = event.public === false;
-  const isCreate = event.type === "CreateEvent";
-  const privateCreateDetail = isCreate ? compact(event.payload?.ref_type) || null : null;
 
   return {
     id: event.id,
@@ -291,7 +282,7 @@ const toItem = (event: GitHubEvent): ActivityItem => {
     url: isPrivate ? null : eventUrl(event),
     commits: isPrivate ? [] : commitItems(event),
     compareUrl: isPrivate ? null : compareUrl(event),
-    detail: isPrivate ? privateCreateDetail ?? "private" : detailFor(event)
+    detail: isPrivate ? "private" : detailFor(event)
   };
 };
 

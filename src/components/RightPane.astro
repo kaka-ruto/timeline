@@ -50,16 +50,6 @@ import { githubConfig, profile } from "../data/site";
       if (event.type === "WatchEvent") return `Starred ${event.repo}`;
       if (event.type === "ForkEvent") return `Forked ${event.repo}`;
       if (event.type === "ReleaseEvent") return `Published a release in ${event.repo}`;
-      if (event.type === "CreateEvent") {
-        const detail = typeof event.detail === "string" && event.detail !== "private" ? event.detail : null;
-        if (event.visibility === "private") {
-          if (detail) return `Created a ${detail} in ${event.repo}`;
-          return null;
-        }
-
-        if (detail) return `Created ${detail} in ${event.repo}`;
-        return `Created something in ${event.repo}`;
-      }
 
       return null;
     };
