@@ -278,6 +278,8 @@ const PRIVATE_REPO_NAME = "a private repo";
 
 const toItem = (event: GitHubEvent): ActivityItem => {
   const isPrivate = event.public === false;
+  const isCreate = event.type === "CreateEvent";
+  const privateCreateDetail = isCreate ? compact(event.payload?.ref_type) || null : null;
 
   return {
     id: event.id,
@@ -290,7 +292,7 @@ const toItem = (event: GitHubEvent): ActivityItem => {
     url: isPrivate ? null : eventUrl(event),
     commits: isPrivate ? [] : commitItems(event),
     compareUrl: isPrivate ? null : compareUrl(event),
-    detail: isPrivate ? "private" : detailFor(event)
+    detail: isPrivate ? privateCreateDetail ?? "private" : detailFor(event)
   };
 };
 
@@ -627,7 +629,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
   const token = env.GITHUB_TOKEN;
   const cache = env.GITHUB_ACTIVITY_CACHE;
-  const cacheKey = `github-activity:${username}:v7`;
+  const cacheKey = `github-activity:${username}:v8`;
 
   try {
     if (cache) {
