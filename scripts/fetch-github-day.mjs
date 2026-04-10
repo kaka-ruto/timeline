@@ -1,9 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const HOME_TIMEZONE = "Africa/Nairobi";
-const DEFAULT_USERNAME = "kaka-ruto";
-
 const usage = () => {
   // eslint-disable-next-line no-console
   console.error("Usage: node scripts/fetch-github-day.mjs [--date YYYY-MM-DD] [--username USERNAME]");
@@ -22,6 +19,11 @@ const parseArgs = () => {
     }
     if (value === "--username") {
       options.username = args[i + 1];
+      i += 1;
+      continue;
+    }
+    if (value === "--timezone") {
+      options.timeZone = args[i + 1];
       i += 1;
       continue;
     }
@@ -97,11 +99,28 @@ const tokenFromDevVars = (root) => {
   return null;
 };
 
+const readSiteConfig = (root) => {
+  const filePath = path.join(root, "src", "data", "site.ts");
+  const contents = fs.readFileSync(filePath, "utf8");
+
+  const usernameMatch = contents.match(/githubConfig\s*=\s*\{[\s\S]*?username:\s*"([^"]+)"/m);
+  const timeZoneMatch = contents.match(/builderLogConfig\s*=\s*\{[\s\S]*?timeZone:\s*"([^"]+)"/m);
+
+  return {
+    username: usernameMatch?.[1] ?? null,
+    timeZone: timeZoneMatch?.[1] ?? null
+  };
+};
+
 const main = async () => {
   const root = process.cwd();
   const options = parseArgs();
-  const username = options.username ?? DEFAULT_USERNAME;
-  const timeZone = HOME_TIMEZONE;
+  const siteConfig = readSiteConfig(root);
+  const username = options.username ?? siteConfig.username;
+  const timeZone = options.timeZone ?? siteConfig.timeZone;
+
+  if (!username) throw new Error("Missing GitHub username. Pass --username or set src/data/site.ts githubConfig.username.");
+  if (!timeZone) throw new Error("Missing time zone. Pass --timezone or set src/data/site.ts builderLogConfig.timeZone.");
 
   const date = options.date ?? formatLocalDate(new Date(), timeZone);
   const sinceUtc = isoAtStartOfDayUtc(date, timeZone);
@@ -163,4 +182,3 @@ main().catch((error) => {
   console.error(error?.stack || String(error));
   process.exit(1);
 });
-

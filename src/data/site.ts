@@ -47,6 +47,10 @@ export const githubConfig = {
   eventsLimit: 30
 };
 
+export const builderLogConfig = {
+  timeZone: "Africa/Nairobi"
+};
+
 export const feedItems: FeedItem[] = [
   {
     id: "4ditor",
