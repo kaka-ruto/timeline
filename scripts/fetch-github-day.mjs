@@ -152,6 +152,41 @@ const fetchJson = async (url, headers) => {
   return response.json();
 };
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const describeFetchError = (error) => {
+  const message = error?.message ? String(error.message) : String(error);
+  const cause = error?.cause;
+  if (!cause) return { message };
+  return {
+    message,
+    cause: {
+      name: cause?.name,
+      code: cause?.code,
+      errno: cause?.errno,
+      syscall: cause?.syscall
+    }
+  };
+};
+
+const fetchWithRetry = async (url, headers, attempts = 3) => {
+  let lastError = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await fetch(url, { headers });
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) {
+        await sleep(350 * attempt);
+        continue;
+      }
+    }
+  }
+  const details = describeFetchError(lastError);
+  const serialized = JSON.stringify(details);
+  throw new Error(`Fetch failed for ${url}: ${serialized}`);
+};
+
 const enrichEvent = async (event, headers) => {
   const type = String(event?.type ?? "");
   const repo = String(event?.repo?.name ?? "");
@@ -297,7 +332,8 @@ const main = async () => {
   if (!token) throw new Error("Missing GITHUB_TOKEN in .dev.vars.");
 
   const headers = buildHeaders(token);
-  const response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}/events?per_page=100`, { headers });
+  const eventsUrl = `https://api.github.com/users/${encodeURIComponent(username)}/events?per_page=100`;
+  const response = await fetchWithRetry(eventsUrl, headers, 4);
 
   if (!response.ok) {
     const body = await response.text().catch(() => "");
