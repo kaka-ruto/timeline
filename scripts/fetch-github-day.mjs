@@ -3,7 +3,9 @@ import path from "node:path";
 
 const usage = () => {
   // eslint-disable-next-line no-console
-  console.error("Usage: node scripts/fetch-github-day.mjs [--date YYYY-MM-DD] [--username USERNAME]");
+  console.error(
+    "Usage: node scripts/fetch-github-day.mjs [--date YYYY-MM-DD | --hours N] [--username USERNAME] [--timezone TZ]"
+  );
   process.exit(2);
 };
 
@@ -14,6 +16,11 @@ const parseArgs = () => {
     const value = args[i];
     if (value === "--date") {
       options.date = args[i + 1];
+      i += 1;
+      continue;
+    }
+    if (value === "--hours") {
+      options.hours = args[i + 1];
       i += 1;
       continue;
     }
@@ -84,6 +91,13 @@ const isoAtStartOfDayUtc = (dateString, timeZone) => {
   return new Date(startUtcMs).toISOString();
 };
 
+const normalizeHours = (value) => {
+  if (value === undefined || value === null) return null;
+  const parsed = Number.parseInt(String(value), 10);
+  if (Number.isNaN(parsed) || parsed < 1) return null;
+  return Math.min(parsed, 72);
+};
+
 const tokenFromDevVars = (root) => {
   const filePath = path.join(root, ".dev.vars");
   const raw = fs.readFileSync(filePath, "utf8");
@@ -122,12 +136,16 @@ const main = async () => {
   if (!username) throw new Error("Missing GitHub username. Pass --username or set src/data/site.ts githubConfig.username.");
   if (!timeZone) throw new Error("Missing time zone. Pass --timezone or set src/data/site.ts builderLogConfig.timeZone.");
 
-  const date = options.date ?? formatLocalDate(new Date(), timeZone);
-  const sinceUtc = isoAtStartOfDayUtc(date, timeZone);
-  const untilUtc = isoAtStartOfDayUtc(
-    new Date(Date.parse(`${date}T00:00:00Z`) + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
-    timeZone
-  );
+  const hours = normalizeHours(options.hours);
+  if (hours && options.date) throw new Error("Use either --date or --hours, not both.");
+
+  const now = new Date();
+  const date = options.date ?? formatLocalDate(now, timeZone);
+
+  const sinceUtc = hours ? new Date(now.getTime() - hours * 60 * 60 * 1000).toISOString() : isoAtStartOfDayUtc(date, timeZone);
+  const untilUtc = hours
+    ? new Date(now.getTime()).toISOString()
+    : isoAtStartOfDayUtc(new Date(Date.parse(`${date}T00:00:00Z`) + 24 * 60 * 60 * 1000).toISOString().slice(0, 10), timeZone);
 
   const token = tokenFromDevVars(root);
   if (!token) throw new Error("Missing GITHUB_TOKEN in .dev.vars.");
@@ -149,7 +167,7 @@ const main = async () => {
   const startMs = Date.parse(sinceUtc);
   const endMs = Date.parse(untilUtc);
 
-  const inDay = Array.isArray(events)
+  const inWindow = Array.isArray(events)
     ? events.filter((event) => {
         const ts = Date.parse(String(event?.created_at ?? ""));
         return Number.isFinite(ts) && ts >= startMs && ts < endMs;
@@ -158,9 +176,11 @@ const main = async () => {
 
   const outDir = path.join(root, ".tmp");
   fs.mkdirSync(outDir, { recursive: true });
-  const outPath = path.join(outDir, `builder-log-input-${date}.json`);
+  const suffix = hours ? `${date}-last-${hours}h` : date;
+  const outPath = path.join(outDir, `builder-log-input-${suffix}.json`);
 
   const payload = {
+    mode: hours ? "rolling" : "day",
     date,
     timeZone,
     username,
@@ -168,8 +188,33 @@ const main = async () => {
     sinceUtc,
     untilUtc,
     totalFetched: Array.isArray(events) ? events.length : 0,
-    inDayCount: inDay.length,
-    events: inDay
+    windowCount: inWindow.length,
+    summary: (() => {
+      const countsByType = {};
+      let publicCount = 0;
+      let privateCount = 0;
+      const repoCounts = {};
+
+      for (const event of inWindow) {
+        const type = String(event?.type ?? "UnknownEvent");
+        countsByType[type] = (countsByType[type] ?? 0) + 1;
+
+        const isPrivate = event?.public === false;
+        if (isPrivate) privateCount += 1;
+        else publicCount += 1;
+
+        const repo = String(event?.repo?.name ?? "");
+        if (repo) repoCounts[repo] = (repoCounts[repo] ?? 0) + 1;
+      }
+
+      return {
+        publicCount,
+        privateCount,
+        countsByType,
+        countsByRepo: repoCounts
+      };
+    })(),
+    events: inWindow
   };
 
   fs.writeFileSync(outPath, JSON.stringify(payload, null, 2) + "\n", "utf8");
