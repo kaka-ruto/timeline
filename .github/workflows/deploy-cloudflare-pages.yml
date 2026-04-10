@@ -19,9 +19,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: |
-          npm config set min-release-age=7
-          npm ci
+        run: npm ci
 
       - name: Build
         run: npm run build
