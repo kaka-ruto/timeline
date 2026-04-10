@@ -78,7 +78,7 @@ type ActivityItem = {
 
 const MAX_LIMIT = 10;
 const FETCH_LIMIT = 30;
-const COMMIT_LOOKBACK_DAYS = 14;
+const COMMIT_LOOKBACK_DAYS = 90;
 const CACHE_TTL_SECONDS = 600;
 const PRIVATE_LABEL = "Private repository";
 
@@ -485,7 +485,7 @@ const fetchSearchEvents = async (
   reposIndex: Map<string, boolean>
 ): Promise<GitHubEvent[]> => {
   const headers = buildHeaders(token);
-  const query = kind === "pr" ? `author:${username} type:pr` : `author:${username} type:issue`;
+  const query = kind === "pr" ? `involves:${username} type:pr` : `involves:${username} type:issue`;
 
   const response = await fetch(searchUrl(query), { headers });
   if (!response.ok) return [];
@@ -545,7 +545,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
   const token = env.GITHUB_TOKEN;
   const cache = env.GITHUB_ACTIVITY_CACHE;
-  const cacheKey = `github-activity:${username}:v2`;
+  const cacheKey = `github-activity:${username}:v3`;
 
   try {
     if (cache) {
