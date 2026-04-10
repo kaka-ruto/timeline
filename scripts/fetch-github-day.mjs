@@ -1,12 +1,23 @@
 import fs from "node:fs";
 import path from "node:path";
 
+const MAX_ENRICH_EVENTS = 50;
+const MAX_BODY_CHARS = 4000;
+const MAX_COMMIT_ITEMS = 10;
+
 const usage = () => {
   // eslint-disable-next-line no-console
   console.error(
     "Usage: node scripts/fetch-github-day.mjs [--date YYYY-MM-DD | --hours N] [--username USERNAME] [--timezone TZ]"
   );
   process.exit(2);
+};
+
+const clampText = (value, maxChars = MAX_BODY_CHARS) => {
+  const text = String(value ?? "");
+  if (!text) return "";
+  if (text.length <= maxChars) return text;
+  return `${text.slice(0, maxChars)}…`;
 };
 
 const parseArgs = () => {
@@ -98,6 +109,12 @@ const normalizeHours = (value) => {
   return Math.min(parsed, 72);
 };
 
+const buildHeaders = (token) => ({
+  Accept: "application/vnd.github+json",
+  Authorization: `Bearer ${token}`,
+  "User-Agent": "kakaruto.com-builder-log"
+});
+
 const tokenFromDevVars = (root) => {
   const filePath = path.join(root, ".dev.vars");
   const raw = fs.readFileSync(filePath, "utf8");
@@ -126,6 +143,135 @@ const readSiteConfig = (root) => {
   };
 };
 
+const fetchJson = async (url, headers) => {
+  const response = await fetch(url, { headers });
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    throw new Error(`Fetch failed (${response.status}) for ${url}: ${body.slice(0, 200)}`);
+  }
+  return response.json();
+};
+
+const enrichEvent = async (event, headers) => {
+  const type = String(event?.type ?? "");
+  const repo = String(event?.repo?.name ?? "");
+
+  if (type === "PushEvent") {
+    const before = event?.payload?.before;
+    const head = event?.payload?.head;
+    if (!repo || !before || !head) return null;
+
+    try {
+      const compare = await fetchJson(`https://api.github.com/repos/${repo}/compare/${before}...${head}`, headers);
+      const commits = Array.isArray(compare?.commits) ? compare.commits : [];
+      return {
+        kind: "compare",
+        repo,
+        compareUrl: compare?.html_url ?? null,
+        totalCommits: compare?.total_commits ?? null,
+        commits: commits.slice(0, MAX_COMMIT_ITEMS).map((commit) => ({
+          sha: String(commit?.sha ?? "").slice(0, 40),
+          message: clampText(String(commit?.commit?.message ?? "Commit").split("\n")[0], 240)
+        }))
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  if (type === "PullRequestEvent") {
+    const apiUrl = event?.payload?.pull_request?.url;
+    if (!apiUrl) return null;
+
+    try {
+      const pr = await fetchJson(apiUrl, headers);
+      return {
+        kind: "pull_request",
+        title: clampText(pr?.title, 240),
+        body: clampText(pr?.body),
+        html_url: pr?.html_url ?? null,
+        state: pr?.state ?? null,
+        merged: pr?.merged ?? null,
+        additions: pr?.additions ?? null,
+        deletions: pr?.deletions ?? null,
+        changed_files: pr?.changed_files ?? null
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  if (type === "IssuesEvent") {
+    const apiUrl = event?.payload?.issue?.url;
+    if (!apiUrl) return null;
+    try {
+      const issue = await fetchJson(apiUrl, headers);
+      return {
+        kind: "issue",
+        title: clampText(issue?.title, 240),
+        body: clampText(issue?.body),
+        html_url: issue?.html_url ?? null,
+        state: issue?.state ?? null
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  if (type === "IssueCommentEvent") {
+    const commentUrl = event?.payload?.comment?.url;
+    const issueUrl = event?.payload?.issue?.url;
+    if (!commentUrl && !issueUrl) return null;
+    try {
+      const [comment, issue] = await Promise.all([
+        commentUrl ? fetchJson(commentUrl, headers).catch(() => null) : Promise.resolve(null),
+        issueUrl ? fetchJson(issueUrl, headers).catch(() => null) : Promise.resolve(null)
+      ]);
+      return {
+        kind: "issue_comment",
+        issueTitle: clampText(issue?.title, 240),
+        issueUrl: issue?.html_url ?? null,
+        commentBody: clampText(comment?.body),
+        commentUrl: comment?.html_url ?? null
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  if (type === "PullRequestReviewEvent" || type === "PullRequestReviewCommentEvent") {
+    const prUrl = event?.payload?.pull_request?.url;
+    if (!prUrl) return null;
+    try {
+      const pr = await fetchJson(prUrl, headers);
+      return {
+        kind: "pull_request",
+        title: clampText(pr?.title, 240),
+        body: clampText(pr?.body),
+        html_url: pr?.html_url ?? null,
+        state: pr?.state ?? null,
+        merged: pr?.merged ?? null
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  if (type === "ReleaseEvent") {
+    const release = event?.payload?.release;
+    if (!release) return null;
+    return {
+      kind: "release",
+      name: clampText(release?.name, 240),
+      tag_name: clampText(release?.tag_name, 64),
+      body: clampText(release?.body),
+      html_url: release?.html_url ?? null
+    };
+  }
+
+  return null;
+};
+
 const main = async () => {
   const root = process.cwd();
   const options = parseArgs();
@@ -150,13 +296,8 @@ const main = async () => {
   const token = tokenFromDevVars(root);
   if (!token) throw new Error("Missing GITHUB_TOKEN in .dev.vars.");
 
-  const response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}/events?per_page=100`, {
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${token}`,
-      "User-Agent": "kakaruto.com-builder-log"
-    }
-  });
+  const headers = buildHeaders(token);
+  const response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}/events?per_page=100`, { headers });
 
   if (!response.ok) {
     const body = await response.text().catch(() => "");
@@ -228,6 +369,21 @@ const main = async () => {
     })(),
     events: inWindow
   };
+
+  // Enrich a limited number of events to provide the LLM with enough context.
+  // Best effort: if enrichment fails or rate-limited, still write the base payload.
+  const enriched = [];
+  for (const event of payload.events.slice(0, MAX_ENRICH_EVENTS)) {
+    try {
+      const extra = await enrichEvent(event, headers);
+      if (extra) enriched.push([String(event?.id ?? ""), extra]);
+    } catch {
+      // ignore
+    }
+  }
+  if (enriched.length > 0) {
+    payload.enrichedByEventId = Object.fromEntries(enriched);
+  }
 
   fs.writeFileSync(outPath, JSON.stringify(payload, null, 2) + "\n", "utf8");
   // eslint-disable-next-line no-console
