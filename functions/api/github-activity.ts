@@ -217,6 +217,15 @@ const toAction = (event: GitHubEvent): string => {
   return event.type.replace("Event", "").toLowerCase();
 };
 
+const normalizeToken = (token?: string) => {
+  const value = String(token ?? "").trim();
+  if (!value) return undefined;
+  if ((value.startsWith("'") && value.endsWith("'")) || (value.startsWith('"') && value.endsWith('"'))) {
+    return value.slice(1, -1).trim() || undefined;
+  }
+  return value;
+};
+
 const buildHeaders = (token?: string): Record<string, string> => {
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
@@ -265,19 +274,25 @@ const enrichPushEvents = async (events: GitHubEvent[], token?: string): Promise<
   );
 };
 
-const toItem = (event: GitHubEvent): ActivityItem => ({
-  id: event.id,
-  visibility: event.public === false ? "private" : "public",
-  type: event.type,
-  repo: event.repo?.name ?? "Unknown repository",
-  createdAt: event.created_at,
-  commitCount: Array.isArray(event.payload?.commits) ? event.payload.commits.length : 0,
-  action: toAction(event),
-  url: eventUrl(event),
-  commits: commitItems(event),
-  compareUrl: compareUrl(event),
-  detail: detailFor(event)
-});
+const PRIVATE_REPO_NAME = "a private repo";
+
+const toItem = (event: GitHubEvent): ActivityItem => {
+  const isPrivate = event.public === false;
+
+  return {
+    id: event.id,
+    visibility: isPrivate ? "private" : "public",
+    type: event.type,
+    repo: isPrivate ? PRIVATE_REPO_NAME : event.repo?.name ?? "Unknown repository",
+    createdAt: event.created_at,
+    commitCount: Array.isArray(event.payload?.commits) ? event.payload.commits.length : 0,
+    action: toAction(event),
+    url: isPrivate ? null : eventUrl(event),
+    commits: isPrivate ? [] : commitItems(event),
+    compareUrl: isPrivate ? null : compareUrl(event),
+    detail: isPrivate ? "private" : detailFor(event)
+  };
+};
 
 const redactedPrivateSummary = (events: GitHubEvent[]) => {
   const privateEvents = events.filter((event) => event.public === false);
@@ -314,17 +329,19 @@ const fetchPublicEvents = async (username: string) => {
 };
 
 const fetchGitHubEvents = async (username: string, token?: string) => {
-  if (!token) {
+  const normalizedToken = normalizeToken(token);
+
+  if (!normalizedToken) {
     return fetchPublicEvents(username);
   }
 
-  const headers = buildHeaders(token);
+  const headers = buildHeaders(normalizedToken);
 
   const response = await fetch(`https://api.github.com/user/events?per_page=${FETCH_LIMIT}`, { headers });
   if (!response.ok) {
     // Fine-grained token permissions or endpoint access may block private activity.
     // In that case, build a mixed public/private activity feed from accessible repo commits.
-    return fetchRepoCommitEvents(username, token);
+    return fetchRepoActivity(username, normalizedToken);
   }
 
   const events = (await response.json()) as GitHubEvent[];
@@ -334,6 +351,40 @@ const fetchGitHubEvents = async (username: string, token?: string) => {
 type Repo = {
   full_name: string;
   private?: boolean;
+};
+
+const fetchReposForActivity = async (token: string): Promise<Repo[]> => {
+  const headers = buildHeaders(token);
+  const repos: Repo[] = [];
+
+  for (let page = 1; page <= 2; page += 1) {
+    const response = await fetch(
+      `https://api.github.com/user/repos?sort=pushed&direction=desc&per_page=50&page=${page}&affiliation=owner,collaborator,organization_member`,
+      { headers }
+    );
+
+    if (!response.ok) break;
+    const batch = (await response.json()) as Repo[];
+    repos.push(...batch);
+    if (batch.length < 50) break;
+  }
+
+  return repos;
+};
+
+type IssueOrPullRequestSearchItem = {
+  id: number;
+  html_url?: string;
+  title?: string;
+  body?: string;
+  created_at?: string;
+  updated_at?: string;
+  repository_url?: string;
+  pull_request?: unknown;
+};
+
+type SearchResponse = {
+  items?: IssueOrPullRequestSearchItem[];
 };
 
 type RepoCommit = {
@@ -346,19 +397,50 @@ type RepoCommit = {
   };
 };
 
-const fetchRepoCommitEvents = async (username: string, token: string): Promise<GitHubEvent[]> => {
-  const headers = buildHeaders(token);
-  const reposResponse = await fetch(
-    "https://api.github.com/user/repos?sort=pushed&direction=desc&per_page=50&type=owner",
-    { headers }
-  );
+const repoNameFromUrl = (value?: string) => {
+  const url = String(value ?? "");
+  const marker = "/repos/";
+  const index = url.indexOf(marker);
+  if (index === -1) return null;
+  const remainder = url.slice(index + marker.length);
+  const parts = remainder.split("/");
+  const owner = parts[0];
+  const name = parts[1];
+  if (!owner || !name) return null;
+  return `${owner}/${name}`;
+};
 
-  if (!reposResponse.ok) {
+const fetchRepoActivity = async (username: string, token: string): Promise<GitHubEvent[]> => {
+  const repos = await fetchReposForActivity(token);
+  if (repos.length === 0) {
     return fetchPublicEvents(username);
   }
+  const reposIndex = new Map(repos.map((repo) => [repo.full_name, repo.private === true]));
 
-  const repos = ((await reposResponse.json()) as Repo[]).slice(0, 20);
   const since = new Date(Date.now() - COMMIT_LOOKBACK_DAYS * 24 * 60 * 60 * 1000).toISOString();
+
+  const commitsPromise = fetchRepoCommitEventsForRepos(username, token, repos.slice(0, 20), since);
+  const prsPromise = fetchSearchEvents(username, token, "pr", reposIndex);
+  const issuesPromise = fetchSearchEvents(username, token, "issue", reposIndex);
+
+  const [commitEvents, prEvents, issueEvents] = await Promise.all([commitsPromise, prsPromise, issuesPromise]);
+  return [...commitEvents, ...prEvents, ...issueEvents].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+};
+
+const fetchRepoCommitEvents = async (username: string, token: string): Promise<GitHubEvent[]> => {
+  const repos = (await fetchReposForActivity(token)).slice(0, 20);
+  if (repos.length === 0) return fetchPublicEvents(username);
+  const since = new Date(Date.now() - COMMIT_LOOKBACK_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  return fetchRepoCommitEventsForRepos(username, token, repos, since);
+};
+
+const fetchRepoCommitEventsForRepos = async (
+  username: string,
+  token: string,
+  repos: Repo[],
+  since: string
+): Promise<GitHubEvent[]> => {
+  const headers = buildHeaders(token);
 
   const results = await Promise.all(
     repos.map(async (repo) => {
@@ -393,6 +475,65 @@ const fetchRepoCommitEvents = async (username: string, token: string): Promise<G
   return results.flat().sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
 };
 
+const searchUrl = (query: string) =>
+  `https://api.github.com/search/issues?q=${encodeURIComponent(query)}&sort=updated&order=desc&per_page=10`;
+
+const fetchSearchEvents = async (
+  username: string,
+  token: string,
+  kind: "pr" | "issue",
+  reposIndex: Map<string, boolean>
+): Promise<GitHubEvent[]> => {
+  const headers = buildHeaders(token);
+  const query = kind === "pr" ? `author:${username} type:pr` : `author:${username} type:issue`;
+
+  const response = await fetch(searchUrl(query), { headers });
+  if (!response.ok) return [];
+
+  const search = (await response.json()) as SearchResponse;
+  const items = (search.items ?? []).filter((item) => item && item.html_url);
+
+  return items.map((item) => {
+    const repoName = repoNameFromUrl(item.repository_url) ?? "Unknown repository";
+    const isPrivate = reposIndex.get(repoName) === true;
+    const createdAt = item.updated_at ?? item.created_at ?? new Date().toISOString();
+
+    if (kind === "pr") {
+      return {
+        id: `pr-${item.id}`,
+        type: "PullRequestEvent",
+        public: isPrivate ? false : true,
+        created_at: createdAt,
+        repo: { name: repoName },
+        payload: {
+          action: "updated",
+          pull_request: {
+            title: item.title,
+            body: item.body,
+            html_url: item.html_url
+          }
+        }
+      } as GitHubEvent;
+    }
+
+    return {
+      id: `issue-${item.id}`,
+      type: "IssuesEvent",
+      public: isPrivate ? false : true,
+      created_at: createdAt,
+      repo: { name: repoName },
+      payload: {
+        action: "updated",
+        issue: {
+          title: item.title,
+          body: item.body,
+          html_url: item.html_url
+        }
+      }
+    } as GitHubEvent;
+  });
+};
+
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const url = new URL(request.url);
   const username = (url.searchParams.get("username") ?? "").trim();
@@ -404,7 +545,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
   const token = env.GITHUB_TOKEN;
   const cache = env.GITHUB_ACTIVITY_CACHE;
-  const cacheKey = `github-activity:${username}:v1`;
+  const cacheKey = `github-activity:${username}:v2`;
 
   try {
     if (cache) {
