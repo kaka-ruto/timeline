@@ -199,7 +199,6 @@ const isMeaningfulEvent = (event: GitHubEvent): boolean => {
     "ReleaseEvent",
     "WatchEvent",
     "ForkEvent",
-    "CreateEvent"
   ]);
 
   if (!allowed.has(event.type)) return false;
