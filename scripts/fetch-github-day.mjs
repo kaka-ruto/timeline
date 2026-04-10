@@ -179,6 +179,18 @@ const main = async () => {
   const suffix = hours ? `${date}-last-${hours}h` : date;
   const outPath = path.join(outDir, `builder-log-input-${suffix}.json`);
 
+  // Keep only one input file around for the automation: delete older builder-log inputs before writing the new one.
+  for (const entry of fs.readdirSync(outDir)) {
+    if (!entry.startsWith("builder-log-input-") || !entry.endsWith(".json")) continue;
+    const candidate = path.join(outDir, entry);
+    if (candidate === outPath) continue;
+    try {
+      fs.unlinkSync(candidate);
+    } catch {
+      // best effort
+    }
+  }
+
   const payload = {
     mode: hours ? "rolling" : "day",
     date,
