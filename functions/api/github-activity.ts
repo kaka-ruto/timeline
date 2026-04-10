@@ -525,7 +525,8 @@ const contributionTimestampFor = async (
   // when you authored the item.
   const authoredAt = item.user?.login === username ? item.created_at ?? null : null;
   const commentedAt = await latestIssueCommentAt(item, username, headers, since);
-  return maxIsoTime(authoredAt, commentedAt) ?? item.created_at ?? item.updated_at ?? new Date().toISOString();
+  // Do not fall back to `updated_at` (can be bumped by other people); only show items we can tie to you.
+  return maxIsoTime(authoredAt, commentedAt);
 };
 
 const fetchSearchEvents = async (
@@ -624,7 +625,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
   const token = env.GITHUB_TOKEN;
   const cache = env.GITHUB_ACTIVITY_CACHE;
-  const cacheKey = `github-activity:${username}:v5`;
+  const cacheKey = `github-activity:${username}:v6`;
 
   try {
     if (cache) {
