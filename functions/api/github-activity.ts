@@ -337,7 +337,9 @@ const fetchGitHubEvents = async (username: string, token?: string) => {
 
   const headers = buildHeaders(normalizedToken);
 
-  const response = await fetch(`https://api.github.com/user/events?per_page=${FETCH_LIMIT}`, { headers });
+  // GitHub does not expose `/user/events` on the REST API; authenticated access to private events
+  // is provided via `/users/{username}/events` when the token belongs to that username.
+  const response = await fetch(`https://api.github.com/users/${username}/events?per_page=${FETCH_LIMIT}`, { headers });
   if (!response.ok) {
     // Fine-grained token permissions or endpoint access may block private activity.
     // In that case, build a mixed public/private activity feed from accessible repo commits.
@@ -625,7 +627,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
   const token = env.GITHUB_TOKEN;
   const cache = env.GITHUB_ACTIVITY_CACHE;
-  const cacheKey = `github-activity:${username}:v6`;
+  const cacheKey = `github-activity:${username}:v7`;
 
   try {
     if (cache) {
