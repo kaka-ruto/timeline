@@ -5,6 +5,9 @@ const builderLog = defineCollection({
   loader: glob({ base: "./src/content/builder-log", pattern: "**/*.md" }),
   schema: z.object({
     date: z.coerce.date(),
+    contributionsTotal: z.number().int().min(0).optional(),
+    contributionsPublic: z.number().int().min(0).optional(),
+    contributionsPrivate: z.number().int().min(0).optional(),
     hook: z.string().min(1),
     action: z.string().min(1),
     result: z.string().min(1),
