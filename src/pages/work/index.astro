@@ -25,7 +25,7 @@ const sortedHistory = workEntries.sort((a, b) =>
             </div>
             <div class="text-sm text-emerald-400">{entry.data.period}</div>
           </div>
-          <p class="mt-0.5 text-xs font-medium text-zinc-300">{entry.data.location}</p>
+          <p class="mt-1 text-xs text-zinc-400">{entry.data.location}</p>
           
           <ul class="mt-3 space-y-1.5">
             {entry.body.split("\n").filter(line => line.trim().startsWith("-")).slice(0, 3).map((line) => (
