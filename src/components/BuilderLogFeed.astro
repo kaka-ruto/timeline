@@ -1,4 +1,6 @@
 ---
+import { builderLogConfig } from "../lib/site";
+
 type BuilderLogItem = {
   id: string;
   data: {
@@ -19,7 +21,7 @@ const { entries, initialCount = 14, batchSize = 14 } = Astro.props as {
   batchSize?: number;
 };
 
-const HOME_TIMEZONE = "Africa/Nairobi";
+const HOME_TIMEZONE = builderLogConfig.timeZone;
 
 const dayParts = (value: Date) => {
   const parts = new Intl.DateTimeFormat("en-CA", {

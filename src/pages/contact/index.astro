@@ -1,8 +1,9 @@
 ---
 import AppShell from "../../layouts/AppShell.astro";
+import { pageMeta, profile } from "../../lib/site";
 ---
 
-<AppShell activePath="/contact" pageTitle="Contact | Kaka Ruto" pageDescription="How to contact Kaka Ruto.">
+<AppShell activePath="/contact" pageTitle={pageMeta.titleFor("Contact")} pageDescription={`How to contact ${profile.name}.`}>
   <section class="min-h-screen border-x border-zinc-800 bg-black/95 px-5 py-8 pb-20 lg:pb-8">
     <header class="border-b border-zinc-800 pb-6">
       <h2 class="text-2xl font-bold text-zinc-50">Contact</h2>
@@ -30,13 +31,10 @@ import AppShell from "../../layouts/AppShell.astro";
       </div>
     </div>
     
-    <script is:inline>
-      const emailParts = ["contact", "kakaruto", "com"];
-      const email = emailParts.join(".");
-      const contactEmail = email.replace(".", "@").replace(".com", ".com");
+    <script is:inline define:vars={{ contactEmail: profile.contactEmail ?? "contact@example.com", contactName: profile.name }}>
       const openEmail = document.getElementById("open-email");
       const subject = encodeURIComponent("Quick idea");
-      const body = encodeURIComponent("Hi Kaka -\n\n[Your short, clear message here]\n");
+      const body = encodeURIComponent(`Hi ${contactName},\n\n[Your short, clear message here]\n`);
       openEmail?.setAttribute("href", `mailto:${contactEmail}?subject=${subject}&body=${body}`);
     </script>
     

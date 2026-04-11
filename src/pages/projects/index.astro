@@ -1,13 +1,13 @@
 ---
 import AppShell from "../../layouts/AppShell.astro";
-import { projects } from "../../user/site";
+import { pageMeta, profile, projects } from "../../lib/site";
 
 const sortedProjects = [...projects].sort((a, b) => 
   new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
 );
 ---
 
-<AppShell activePath="/projects" pageTitle="Projects | Kaka Ruto" pageDescription="Projects and products built by Kaka Ruto.">
+<AppShell activePath="/projects" pageTitle={pageMeta.titleFor("Projects")} pageDescription={`Projects and products built by ${profile.name}.`}>
   <section class="min-h-screen border-x border-zinc-800 bg-black/95 px-5 py-8 pb-20 lg:pb-8">
     <header class="border-b border-zinc-800 pb-6">
       <h2 class="text-2xl font-bold text-zinc-50">Projects</h2>

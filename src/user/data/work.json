@@ -1,0 +1,36 @@
+[
+  {
+    "id": "smartpension",
+    "company": "SmartPension",
+    "location": "London, UK",
+    "role": "Ruby Software Engineer",
+    "period": "May 2022 - Apr 2024",
+    "startDate": "2022-05-01",
+    "highlights": [
+      "Joined an investments core team responsible for maintaining and developing new features for trading, holdings and valuations",
+      "Abstracted our domain code into a gem used internally in many projects, reducing duplication and saving dev time by 30%",
+      "Automated developer and QA workflows using scripts, shortening cycle time by 9%",
+      "Optimized processes for member valuations and holdings tracking, ensuring accurate and real-time data",
+      "Integrated APIs to facilitate seamless communication with UK payment processors and trading platforms",
+      "Implemented cash holdings that allowed members to easily convert their investments into cash",
+      "Implemented multiple data operations to correct historical data",
+      "Shadowed our Tech Lead - overseeing our domain, leading internal and external code reviews"
+    ]
+  },
+  {
+    "id": "bettyblocks",
+    "company": "BettyBlocks",
+    "location": "Alkmaar, Netherlands",
+    "role": "Elixir Engineer",
+    "period": "Oct 2021 - May 2022",
+    "startDate": "2021-10-01",
+    "highlights": [
+      "Joined BettyBlocks to help maintain the API of the No Code platform",
+      "Joined an Elixir backend team building a graphql api that serviced thousands of businesses and handled millions of requests monthly",
+      "Contributed to an internal ubuntu framework for running the company's suites of microservices",
+      "Implemented a custom api rate limiter to limit too many requests from individual IPs and prevent DDoS attacks",
+      "Joined the company's devops guild as my team's representative"
+    ]
+  }
+]
+

@@ -131,15 +131,15 @@ const tokenFromDevVars = (root) => {
 };
 
 const readSiteConfig = (root) => {
-  const filePath = path.join(root, "src", "user", "site.ts");
-  const contents = fs.readFileSync(filePath, "utf8");
+  const githubPath = path.join(root, "src", "user", "data", "github.json");
+  const builderLogPath = path.join(root, "src", "user", "data", "builder-log.json");
 
-  const usernameMatch = contents.match(/githubConfig\s*=\s*\{[\s\S]*?username:\s*"([^"]+)"/m);
-  const timeZoneMatch = contents.match(/builderLogConfig\s*=\s*\{[\s\S]*?timeZone:\s*"([^"]+)"/m);
+  const github = JSON.parse(fs.readFileSync(githubPath, "utf8"));
+  const builderLog = JSON.parse(fs.readFileSync(builderLogPath, "utf8"));
 
   return {
-    username: usernameMatch?.[1] ?? null,
-    timeZone: timeZoneMatch?.[1] ?? null
+    username: github?.username ? String(github.username) : null,
+    timeZone: builderLog?.timeZone ? String(builderLog.timeZone) : null
   };
 };
 
@@ -314,8 +314,8 @@ const main = async () => {
   const username = options.username ?? siteConfig.username;
   const timeZone = options.timeZone ?? siteConfig.timeZone;
 
-  if (!username) throw new Error("Missing GitHub username. Pass --username or set src/user/site.ts githubConfig.username.");
-  if (!timeZone) throw new Error("Missing time zone. Pass --timezone or set src/user/site.ts builderLogConfig.timeZone.");
+  if (!username) throw new Error("Missing GitHub username. Pass --username or set src/user/data/github.json username.");
+  if (!timeZone) throw new Error("Missing time zone. Pass --timezone or set src/user/data/builder-log.json timeZone.");
 
   const hours = normalizeHours(options.hours);
   if (hours && options.date) throw new Error("Use either --date or --hours, not both.");

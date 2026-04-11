@@ -1,9 +1,10 @@
 ---
 import AppShell from "../../layouts/AppShell.astro";
-import { about } from "../../user/site";
+import AboutBody, { frontmatter as about } from "../../user/data/about.md";
+import { pageMeta, profile } from "../../lib/site";
 ---
 
-<AppShell activePath="/about" pageTitle="About | Kaka Ruto" pageDescription="Background and experience of Kaka Ruto.">
+<AppShell activePath="/about" pageTitle={pageMeta.titleFor("About")} pageDescription={`Background and experience of ${profile.name}.`}>
   <section class="min-h-screen border-x border-zinc-800 bg-black/95 px-5 py-8 pb-20 lg:pb-8">
     <h2 class="text-2xl font-bold text-zinc-50">About</h2>
     <p class="mt-4 max-w-2xl text-zinc-300">{about.intro}</p>
@@ -12,5 +13,9 @@ import { about } from "../../user/site";
         <li class="rounded-xl border border-zinc-800 bg-zinc-950 p-4 text-zinc-200">{highlight}</li>
       ))}
     </ul>
+
+    <div class="prose prose-invert mt-10 max-w-2xl prose-p:text-zinc-300">
+      <AboutBody />
+    </div>
   </section>
 </AppShell>

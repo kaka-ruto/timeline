@@ -2,12 +2,13 @@
 import { getCollection } from "astro:content";
 import BuilderLogFeed from "../components/BuilderLogFeed.astro";
 import AppShell from "../layouts/AppShell.astro";
+import { pageMeta } from "../lib/site";
 
 const builderLogs = (await getCollection("builder-log", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
 );
 ---
 
-<AppShell activePath="/" pageTitle="Kaka Ruto | Portfolio" pageDescription="Product engineer portfolio of Kaka Ruto.">
+<AppShell activePath="/" pageTitle={pageMeta.homeTitle} pageDescription={pageMeta.homeDescription}>
   <BuilderLogFeed entries={builderLogs} initialCount={14} batchSize={14} />
 </AppShell>
