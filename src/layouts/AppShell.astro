@@ -2,7 +2,7 @@
 import "../styles/global.css";
 import LeftPane from "../components/LeftPane.astro";
 import RightPane from "../components/RightPane.astro";
-import { navItems } from "../lib/site";
+import { navItems, profile } from "../lib/site";
 
 const { activePath, pageTitle, pageDescription } = Astro.props;
 ---
@@ -22,6 +22,17 @@ const { activePath, pageTitle, pageDescription } = Astro.props;
     <div class="mx-auto grid min-h-screen max-w-7xl lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_340px]">
       <LeftPane activePath={activePath} />
       <main>
+        <header class="border-b border-zinc-800 px-4 py-4 lg:hidden">
+          <div class="flex items-center gap-3">
+            <img src={profile.avatar} alt={profile.name} class="h-12 w-12 shrink-0 rounded-full object-cover" />
+            <div>
+              <p class="text-base font-bold text-zinc-100">{profile.name}</p>
+              <p class="text-xs text-zinc-400">{profile.handle}</p>
+              <p class="text-xs text-zinc-400">{profile.role}</p>
+            </div>
+          </div>
+          <p class="mt-3 text-sm leading-relaxed text-zinc-300">{profile.bio}</p>
+        </header>
         <slot />
       </main>
       <RightPane />
