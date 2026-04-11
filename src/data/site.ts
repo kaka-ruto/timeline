@@ -98,6 +98,157 @@ export const feedItems: FeedItem[] = [
   }
 ];
 
+export type WorkExperience = {
+  id: string;
+  company: string;
+  location: string;
+  role: string;
+  period: string;
+  startDate: string;
+  highlights: string[];
+};
+
+export const workHistory: WorkExperience[] = [
+  {
+    id: "4ditor",
+    company: "4ditor",
+    location: "Liverpool, UK",
+    role: "Creator",
+    period: "Mar 2025 - Present",
+    startDate: "2025-03-01",
+    highlights: [
+      "Created 4ditor, a fullstack AI-powered SaaS platform, automating photo editing and video content creation for real estate professionals, using Rails 8",
+      "Built an automated video generation engine that transforms property images into dynamic video slideshows, leveraging AI for textual content",
+      "Designed a scheduling system for users to set up regular, automated video creation (daily, weekly, monthly) based on their brand settings",
+      "Integrated multiple AI models to support both advanced image editing capabilities and the generation of content for videos",
+      "Implemented a multi-stage review and approval workflow for video elements, ensuring user control and content quality",
+      "Engineered the platform to support team accounts and to manage multiple properties per account",
+      "Supported recurring and one-time payments securely using Stripe",
+      "Self-hosted the app on a Hetzner VPS, deployed with docker",
+      "Led product discovery and strategy, full-stack development, and iterative feature rollouts"
+    ]
+  },
+  {
+    id: "autohaven",
+    company: "Autohaven",
+    location: "Liverpool, UK",
+    role: "Creator",
+    period: "Apr 2024 - Mar 2025",
+    startDate: "2024-04-01",
+    highlights: [
+      "Built an online car community network with the ability to follow/unfollow accounts, make posts, get comments and likes and grew it to 700 users and 500 posts",
+      "Created 2 automotive AI assistants that use AI to answer car-related questions via messaging and conversation interface",
+      "Built an internal newsletter subscription and emailing system and grew it to 500 subscribers and sent over 2k emails",
+      "Built an articles feature that saw 43 articles being written with an average of 40 readers",
+      "Generated a complex data schema that stored over 100k car-related records from different car data APIs",
+      "Used programmatic SEO to generate over 100k web pages that got indexed by Google",
+      "Processed about 500k background jobs with SolidQueue",
+      "Managed 2 engineering interns, a technical writer and 2 marketers"
+    ]
+  },
+  {
+    id: "smartpension",
+    company: "SmartPension",
+    location: "London, UK",
+    role: "Ruby Software Engineer",
+    period: "May 2022 - Apr 2024",
+    startDate: "2022-05-01",
+    highlights: [
+      "Joined an investments core team responsible for maintaining and developing new features for trading, holdings and valuations",
+      "Abstracted our domain code into a gem used internally in many projects, reducing duplication and saving dev time by 30%",
+      "Automated developer and QA workflows using scripts, shortening cycle time by 9%",
+      "Optimized processes for member valuations and holdings tracking, ensuring accurate and real-time data",
+      "Integrated APIs to facilitate seamless communication with UK payment processors and trading platforms",
+      "Implemented cash holdings that allowed members to easily convert their investments into cash",
+      "Implemented multiple data operations to correct historical data",
+      "Shadowed our Tech Lead - overseeing our domain, leading internal and external code reviews"
+    ]
+  },
+  {
+    id: "bettyblocks",
+    company: "BettyBlocks",
+    location: "Alkmaar, Netherlands",
+    role: "Elixir Engineer",
+    period: "Oct 2021 - May 2022",
+    startDate: "2021-10-01",
+    highlights: [
+      "Joined BettyBlocks to help maintain the API of the No Code platform",
+      "Joined an Elixir backend team building a graphql api that serviced thousands of businesses and handled millions of requests monthly",
+      "Contributed to an internal ubuntu framework for running the company's suites of microservices",
+      "Implemented a custom api rate limiter to limit too many requests from individual IPs and prevent DDoS attacks",
+      "Joined the company's devops guild as my team's representative"
+    ]
+  },
+  {
+    id: "zindi",
+    company: "Zindi",
+    location: "South Africa, Remote",
+    role: "Senior Full Stack Engineer",
+    period: "June 2021 - May 2022",
+    startDate: "2021-06-01",
+    highlights: [
+      "Added end to end features to both the user-facing platform and the admin platform, using Ruby on Rails and React",
+      "Proposed and led the development of a new jobs platform that became a new source of company revenue",
+      "Translated design mockups into code using ReactJS and Redux",
+      "Added and tested new RESTful API endpoints",
+      "Reduced bug turn-around time from numerous days or weeks to a few hours or days",
+      "Received error metrics from the data science team and integrated them to the platform for our competitions' scoring",
+      "Added end to end rescoring logic to rescore our competitions",
+      "Setup deployments to AWS ECS using Docker and Docker Compose"
+    ]
+  },
+  {
+    id: "ourgivingboard",
+    company: "OurGivingBoard",
+    location: "US Remote",
+    role: "Team Lead",
+    period: "Dec 2020 - June 2021",
+    startDate: "2020-12-01",
+    highlights: [
+      "Architected the company's crowdfunding platform using Rails REST API, consumed by a React web app",
+      "Setup CI/CD to various AWS services using Docker",
+      "The API handled over 2000 signups on launch day and processed over $30,000 in transaction volume in week 1",
+      "Led the engineering team of 3"
+    ]
+  },
+  {
+    id: "quirkycoders",
+    company: "QuirkyCoders",
+    location: "Charlotte, NC, Remote",
+    role: "Backend Engineer",
+    period: "May 2020 - Feb 2021",
+    startDate: "2020-05-01",
+    highlights: [
+      "Added features to the recruiting and hiring platform using Rails RESTful API, consumed by a React web app"
+    ]
+  },
+  {
+    id: "sokoplace",
+    company: "SokoPlace",
+    location: "Nairobi, Kenya",
+    role: "Lead Engineer",
+    period: "Jan 2020 - Jan 2021",
+    startDate: "2020-01-01",
+    highlights: [
+      "Architected the company's transport and logistics platform using a Rails GraphQL API",
+      "Consumed by a Vue web app and an Android app",
+      "Setup deployments to AWS ECS using Docker and Docker Compose",
+      "Led the engineering team of 5"
+    ]
+  },
+  {
+    id: "andela",
+    company: "Andela",
+    location: "Nairobi, Kenya",
+    role: "Software Engineer",
+    period: "August 2017 - March 2020",
+    startDate: "2017-08-01",
+    highlights: [
+      "Worked on an internal product and with two of Andela's clients - Gobble(US) and Boatflex(Denmark)"
+    ]
+  }
+];
+
 export const about = {
   intro:
     "I am a product engineer focused on building useful software from idea to production. I work across product discovery, backend architecture, and delivery workflows.",

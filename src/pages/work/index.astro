@@ -1,16 +1,38 @@
 ---
 import AppShell from "../../layouts/AppShell.astro";
-import { about } from "../../data/site";
+import { workHistory } from "../../data/site";
+
+const sortedHistory = [...workHistory].sort((a, b) => 
+  new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+);
 ---
 
 <AppShell activePath="/work" pageTitle="Work | Kaka Ruto" pageDescription="Work experience and highlights by Kaka Ruto.">
   <section class="min-h-screen border-x border-zinc-800 bg-black/95 px-5 py-8 pb-20 lg:pb-8">
-    <h2 class="text-2xl font-bold text-zinc-50">Work</h2>
-    <p class="mt-4 max-w-2xl text-zinc-300">{about.intro}</p>
-    <ul class="mt-6 space-y-3">
-      {about.highlights.map((highlight) => (
-        <li class="rounded-xl border border-zinc-800 bg-zinc-950 p-4 text-zinc-200">{highlight}</li>
+    <header class="border-b border-zinc-800 pb-6">
+      <h2 class="text-2xl font-bold text-zinc-50">Work</h2>
+      <p class="mt-2 text-zinc-400">A timeline of my professional journey building products from idea to production.</p>
+    </header>
+    
+    <div class="-mx-5">
+      {sortedHistory.map((job, i) => (
+        <div class:list={["px-5 py-5", i < sortedHistory.length - 1 && "border-b border-zinc-800"]}>
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <div class="flex items-baseline gap-3">
+              <h3 class="text-base font-semibold text-zinc-100">{job.role}</h3>
+              <span class="text-sky-400">{job.company}</span>
+            </div>
+            <div class="text-sm text-zinc-500">{job.period}</div>
+          </div>
+          <p class="mt-0.5 text-xs text-zinc-600">{job.location}</p>
+          
+          <ul class="mt-3 space-y-1.5">
+            {job.highlights.slice(0, 3).map((highlight) => (
+              <li class="text-sm leading-relaxed text-zinc-400">{highlight}</li>
+            ))}
+          </ul>
+        </div>
       ))}
-    </ul>
+    </div>
   </section>
 </AppShell>
