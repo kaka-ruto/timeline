@@ -16,6 +16,10 @@ A personal portfolio website built with Astro + TailwindCSS, designed to resembl
 - [TailwindCSS](https://tailwindcss.com/) - Styling
 - [Cloudflare Pages](https://pages.cloudflare.com/) - Hosting & Functions
 
+## Demo
+
+See it live at [https://kakaruto.com](https://kakaruto.com)
+
 ---
 
 ## Quick Start
@@ -60,77 +64,80 @@ timeline/
 
 ## Customizing Your Data
 
-### 1. Profile & Navigation
+All content is in `src/user/data/` - just edit markdown files.
 
-Edit `src/user/site.ts` to set your:
+### 1. Profile
 
-- name, handle, role
-- bio, location
-- avatar image path
-- social links (GitHub, X/Twitter, LinkedIn)
-- navigation items
+Edit `src/user/data/profile.json`:
+
+```json
+{
+  "name": "Your Name",
+  "handle": "@yourhandle",
+  "role": "Your Role",
+  "bio": "Your bio",
+  "avatar": "/profile/your-avatar.jpg",
+  "github": "https://github.com/yourhandle",
+  "x": "https://x.com/yourhandle",
+  "linkedin": "https://linkedin.com/in/yourhandle"
+}
+```
 
 ### 2. Work History
 
-Add entries to `workHistory` array in `src/user/site.ts`:
+Add markdown files to `src/user/data/work/`:
 
-```typescript
-export const workHistory: WorkExperience[] = [
-  {
-    id: "company-name",
-    company: "Company Name",
-    location: "City, Country",
-    role: "Software Engineer",
-    period: "Jan 2020 - Present",
-    startDate: "2020-01-01",
-    highlights: [
-      "Built features X",
-      "Led team of Y engineers"
-    ]
-  }
-];
+```markdown
+---
+company: Company Name
+role: Software Engineer
+location: City, Country
+period: Jan 2020 - Present
+startDate: '2020/01/01'
+---
+
+- Built feature X
+- Led team of Y engineers
 ```
 
 ### 3. Projects
 
-Add entries to `projects` array:
+Add markdown files to `src/user/data/projects/`:
 
-```typescript
-export const projects: Project[] = [
-  {
-    id: "project-name",
-    name: "Project Name",
-    url: "https://project-url.com",
-    description: "One-line description",
-    period: "2024 - Present",
-    startDate: "2024-01-01",
-    highlights: [
-      "Feature 1",
-      "Feature 2"
-    ],
-    tags: ["Rails", "AI", "SaaS"]
-  }
-];
+```markdown
+---
+name: Project Name
+url: https://project-url.com
+description: One-line description
+period: 2024 - Present
+startDate: '2024/01/01'
+tags:
+  - Rails
+  - AI
+---
+
+- Feature 1
+- Feature 2
 ```
 
-### 4. Writing/Notes
+### 4. Writing
 
-Add entries to `writings` array:
+Add markdown files to `src/user/data/writing/`:
 
-```typescript
-export const writings: Writing[] = [
-  {
-    id: "post-slug",
-    title: "Your Post Title",
-    url: "/writing/post-slug",
-    summary: "Brief summary of the post",
-    date: "2024-03-15",
-    tags: ["Topic", "Engineering"]
-  }
-];
+```markdown
+---
+title: Your Post Title
+url: /writing/post-slug
+summary: Brief summary
+date: '2024/03/15'
+tags:
+  - Topic
+---
+
+Your post content here.
 ```
 
-### 5. Builder Log (Feed Posts)
+### 5. Daily Builder Log
 
 Add markdown files to `src/user/content/builder-log/`:
 
@@ -140,11 +147,22 @@ date: 2026-04-15
 contributionsTotal: 5
 contributionsPublic: 3
 contributionsPrivate: 2
+hook: What happened
+action: What you did
+result: What happened
+lesson: What you learned
 ---
 
-Your message here. Keep it short and scannable.
-Use the rest of the file for longer content if needed.
+Optional additional details.
 ```
+
+### 6. About Page
+
+Edit `src/user/data/about.md`.
+
+### 7. Navigation
+
+Edit `src/user/data/nav.json` to customize nav items.
 
 ---
 
