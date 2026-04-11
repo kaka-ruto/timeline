@@ -1,122 +1,294 @@
-# Kaka Ruto Timeline Portfolio
+# Timeline Portfolio
 
 A personal portfolio website built with Astro + TailwindCSS, designed to resemble modern Twitter's layout patterns.
 
-## Highlights
-- Twitter-inspired layout architecture.
-- Responsive design:
-  - Desktop (`lg`/`xl`): three panes (left rail, center timeline, right context panel)
-  - Mobile: single-pane feed with bottom navigation
-- Resume-driven content and profile media.
-- Dynamic right pane:
-  - Now status
-  - Live GitHub public activity
+## Features
+
+- **Twitter-inspired layout**: three panes (left rail, center timeline, right context panel)
+- **Responsive**: desktop three-pane layout, mobile single-pane feed with bottom navigation
+- **Resume-driven content**: work history, projects, writing from your data
+- **Dynamic right pane**: Now status + live GitHub activity
+- **Contact form**: Email routing through Cloudflare Workers
 
 ## Tech Stack
-- [Astro](https://astro.build/)
-- [TailwindCSS](https://tailwindcss.com/)
 
-## Local Development
+- [Astro](https://astro.build/) - Static site generator
+- [TailwindCSS](https://tailwindcss.com/) - Styling
+- [Cloudflare Pages](https://pages.cloudflare.com/) - Hosting & Functions
+
+---
+
+## Quick Start
+
 ```bash
+# Clone the repository
+git clone https://github.com/kaka-ruto/timeline.git
+cd timeline
+
+# Install dependencies
 npm install
+
+# Start development server
 npm run dev
 ```
 
-## Local Production-Parity Development (Recommended)
-Run the site the same way Cloudflare Pages runs it (including Functions):
-```bash
-cp .dev.vars.example .dev.vars
-# edit .dev.vars with your real GITHUB_TOKEN
-npm install
-npm run dev:pages
-```
+Open http://localhost:4321 in your browser.
 
-This uses `wrangler@3.90.0 pages dev dist`, so `/api/github-activity` behaves like production.
-Wrangler will print a local URL (typically `http://localhost:8788`) - open that URL in your browser.
-
-## Build
-```bash
-npm run build
-npm run preview
-```
+---
 
 ## Project Structure
-```text
-src/
-  components/
-    LeftPane.astro
-    FeedPane.astro
-    RightPane.astro
-  data/
-    site.ts
-  layouts/
-    AppShell.astro
-  pages/
-    index.astro
-    projects/index.astro
-    writing/index.astro
-    about/index.astro
-public/
-  profile/
-    avatar.jpg
-    kaka.jpeg
-    KakaRutoResume.pdf
+
+```
+timeline/
+├── src/
+│   ├── components/     # UI components (LeftPane, FeedPane, RightPane)
+│   ├── layouts/       # Page layouts
+│   ├── pages/         # Routes (index, /work, /projects, /writing, /contact)
+│   ├── user/          # Your content (builder-log posts, site data)
+│   ├── data/          # Default data types
+│   ├── styles/        # Global styles
+│   └── content.config.ts
+├── functions/api/      # Server-side Functions for Cloudflare Pages
+│   ├── github-activity.ts   # GitHub activity API
+│   └── contact.ts          # Contact form handler
+├── public/profile/    # Images, resume PDF
+├── wrangler.toml      # Cloudflare configuration
+└── .dev.vars.example # Environment variables template
 ```
 
-## Editing Content
-Update data in `src/data/site.ts`:
-- profile metadata
-- navigation
-- timeline/feed cards
-- now status
-- GitHub username/events config
+---
 
-## Contact Form (Cloudflare Email Routing)
-Contact form page: `/contact`  
-Server endpoint: `functions/api/contact.ts`
+## Customizing Your Data
 
-Set these environment variables in Cloudflare Pages project settings:
-- `CONTACT_FORWARD_TO`: your Cloudflare Email Routing alias (for example `contact@kakaruto.com`)
-- `CONTACT_FROM` (optional): sender address for outgoing form notifications (default: `contact.form@kakaruto.com`)
-- `GITHUB_TOKEN` (optional but recommended): GitHub token used server-side for right-pane activity API (helps avoid strict unauthenticated rate limits)
+### 1. Profile & Navigation
 
-For 10-minute activity caching:
-1. Create a Cloudflare KV namespace (for example `github-activity-cache`).
-2. In Pages project settings, add a KV binding:
-   - Variable name: `GITHUB_ACTIVITY_CACHE`
-   - Namespace: `github-activity-cache`
-3. Redeploy.
+Edit `src/user/site.ts` to set your:
 
-Recommended Cloudflare setup:
-1. In Email Routing, create alias `contact@kakaruto.com` forwarding to your private inbox.
-2. In Pages, add `CONTACT_FORWARD_TO=contact@kakaruto.com`.
-3. Deploy.
+- name, handle, role
+- bio, location
+- avatar image path
+- social links (GitHub, X/Twitter, LinkedIn)
+- navigation items
 
-## Cloudflare Pages Deployment
-1. Install Wrangler and login:
+### 2. Work History
+
+Add entries to `workHistory` array in `src/user/site.ts`:
+
+```typescript
+export const workHistory: WorkExperience[] = [
+  {
+    id: "company-name",
+    company: "Company Name",
+    location: "City, Country",
+    role: "Software Engineer",
+    period: "Jan 2020 - Present",
+    startDate: "2020-01-01",
+    highlights: [
+      "Built features X",
+      "Led team of Y engineers"
+    ]
+  }
+];
+```
+
+### 3. Projects
+
+Add entries to `projects` array:
+
+```typescript
+export const projects: Project[] = [
+  {
+    id: "project-name",
+    name: "Project Name",
+    url: "https://project-url.com",
+    description: "One-line description",
+    period: "2024 - Present",
+    startDate: "2024-01-01",
+    highlights: [
+      "Feature 1",
+      "Feature 2"
+    ],
+    tags: ["Rails", "AI", "SaaS"]
+  }
+];
+```
+
+### 4. Writing/Notes
+
+Add entries to `writings` array:
+
+```typescript
+export const writings: Writing[] = [
+  {
+    id: "post-slug",
+    title: "Your Post Title",
+    url: "/writing/post-slug",
+    summary: "Brief summary of the post",
+    date: "2024-03-15",
+    tags: ["Topic", "Engineering"]
+  }
+];
+```
+
+### 5. Builder Log (Feed Posts)
+
+Add markdown files to `src/user/content/builder-log/`:
+
+```markdown
+---
+date: 2026-04-15
+contributionsTotal: 5
+contributionsPublic: 3
+contributionsPrivate: 2
+---
+
+Your message here. Keep it short and scannable.
+Use the rest of the file for longer content if needed.
+```
+
+---
+
+## GitHub Token Setup
+
+### Why You Need a Token
+
+The GitHub activity API in the right pane uses GitHub's public API by default. Without a token:
+
+- Rate limit: 60 requests/hour
+- Limited to public events only
+
+With a token:
+
+- Rate limit: 5,000 requests/hour  
+- Access to private events (if token has appropriate scopes)
+
+### Creating a GitHub Token
+
+1. Go to https://github.com/settings/tokens/new
+2. Set expiration (recommended: 90 days)
+3. Select scopes:
+   - `repo` (full control of private repositories) - optional, only if you want private activity
+   - `read:user` (read user profile data) - optional
+   - No scope needed for public-only activity
+4. Generate and copy the token
+
+### Using the Token Locally
+
 ```bash
-npm i -D wrangler
-npx wrangler login
+# Copy the example file
+cp .dev.vars.example .dev.vars
+
+# Edit with your token
+# Replace "replace_me" with your actual token
 ```
-2. Create Pages project (first time only):
-```bash
-npx wrangler pages project create kakaruto-timeline --production-branch=master
-```
-3. Build and deploy:
+
+### Using the Token in Production
+
+Add the variable in Cloudflare Pages settings:
+
+- Variable name: `GITHUB_TOKEN`
+- Value: your GitHub token
+
+---
+
+## Deploying to Cloudflare Pages
+
+### Option 1: GitHub Actions (Recommended)
+
+This repository includes a workflow that deploys on every push to master.
+
+#### Setup
+
+1. Go to your repo Settings > Secrets and variables > Actions
+2. Add these secrets:
+   - `CLOUDFLARE_API_TOKEN` - Get from Cloudflare Dashboard > Profile > API Tokens
+     - Create Custom Token
+     - Permissions: Pages (Read, Write)
+     - Account resources: Your account
+   - `CLOUDFLARE_ACCOUNT_ID` - Found in Cloudflare Dashboard URL
+
+3. Push to master - deployment starts automatically
+
+#### Manual Deploy
+
 ```bash
 npm run build
-npx wrangler pages deploy dist --project-name=kakaruto-timeline
+npx wrangler pages deploy dist --project-name=your-project-name
 ```
-4. In Cloudflare Pages settings, attach custom domain `kakaruto.com`.
+
+### Option 2: Wrangler CLI
+
+```bash
+# Install Wrangler
+npm i -D wrangler
+
+# Login to Cloudflare
+npx wrangler login
+
+# Create Pages project (first time only)
+npx wrangler pages project create timeline --production-branch=master
+
+# Deploy
+npm run build
+npx wrangler pages deploy dist --project-name=timeline
+```
+
+### Custom Domain
+
+After deployment:
+
+1. Go to Cloudflare Dashboard > Pages > your project > Custom domains
+2. Add your domain (e.g., kakaruto.com)
+3. Update your DNS at your domain registrar
+
+---
+
+## Environment Variables Reference
+
+### Development (.dev.vars)
+
+```bash
+CONTACT_FORWARD_TO=your-email@example.com
+CONTACT_FROM=sender@example.com
+GITHUB_TOKEN=ghp_your_token_here
+```
+
+### Cloudflare Pages Settings
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `CONTACT_FORWARD_TO` | Yes | Email alias to forward contact form submissions |
+| `CONTACT_FROM` | No | Sender address (default: contact.form@yourdomain.com) |
+| `GITHUB_TOKEN` | No | GitHub token for API rate limits |
+| `GITHUB_ACTIVITY_CACHE` | No | KV namespace for 10-minute caching |
+
+### Adding KV Cache (Optional)
+
+For 10-minute GitHub activity caching:
+
+1. Create KV namespace: `wrangler kv:namespace create github-activity-cache`
+2. Add to `wrangler.toml`:
+
+```toml
+[[kv_namespaces]]
+binding = "GITHUB_ACTIVITY_CACHE"
+id = "your-kv-id"
+```
+
+---
+
+## Contact Form (Optional)
+
+The contact form at `/contact` sends emails through Cloudflare Email Routing.
+
+### Setup
+
+1. Enable Cloudflare Email Routing
+2. Create a catch-all rule or specific alias
+3. Set `CONTACT_FORWARD_TO` to your personal email
+
+---
 
 ## License
+
 [MIT](./LICENSE)
-
-## GitHub Actions Deployment
-A workflow is included at `.github/workflows/deploy-cloudflare-pages.yml`.
-
-Add these repository secrets in GitHub:
-- `CLOUDFLARE_API_TOKEN` (Pages Write permission)
-- `CLOUDFLARE_ACCOUNT_ID`
-
-Then every push to `master` will build and deploy to Cloudflare Pages.
