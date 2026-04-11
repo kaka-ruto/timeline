@@ -6,6 +6,31 @@ const writingEntries = await getCollection("writing");
 const sortedWritings = writingEntries.sort((a, b) => 
   new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
 );
+
+const dayParts = (value: Date) => {
+  const parts = String(value).split(/[-T]/).map((part, i) => ({
+    type: (["year", "month", "day", "time"][i] ?? "time") as string,
+    value: part.split(" ")[0]
+  }));
+  return {
+    year: Number(parts.find((part) => part.type === "year")?.value ?? "0"),
+    month: Number(parts.find((part) => part.type === "month")?.value ?? "0"),
+    day: Number(parts.find((part) => part.type === "day")?.value ?? "0")
+  };
+};
+
+const daysAgoText = (value: string) => {
+  const nowParts = dayParts(new Date());
+  const [year, month, day] = value.split("/").map(Number);
+  const nowUtc = Date.UTC(nowParts.year, nowParts.month - 1, nowParts.day);
+  const entryUtc = Date.UTC(year, month - 1, day);
+  const diff = Math.max(0, Math.floor((nowUtc - entryUtc) / 86400000));
+  if (diff === 0) return "today";
+  if (diff === 1) return "1 day ago";
+  if (diff < 30) return `${diff} days ago`;
+  if (diff < 365) return `${Math.floor(diff / 30)} months ago`;
+  return `${Math.floor(diff / 365)} years ago`;
+};
 ---
 
 <AppShell activePath="/writing" pageTitle="Writing | Kaka Ruto" pageDescription="Writing by Kaka Ruto.">
@@ -20,7 +45,7 @@ const sortedWritings = writingEntries.sort((a, b) =>
         <div class:list={["px-5 py-5", i < sortedWritings.length - 1 && "border-b border-zinc-800"]}>
           <div class="flex items-baseline justify-between gap-x-4">
             <a href={entry.data.url} class="text-base font-semibold text-sky-400">{entry.data.title}</a>
-            <time class="text-sm text-emerald-400 shrink-0">{entry.data.date}</time>
+            <time class="text-sm text-emerald-400 shrink-0">{daysAgoText(entry.data.date)}</time>
           </div>
           <p class="mt-2 text-sm leading-relaxed text-zinc-400">{entry.data.summary}</p>
         </div>
