@@ -248,37 +248,173 @@ export const projects: Project[] = [
     id: "4ditor",
     name: "4ditor",
     url: "https://4ditor.com",
-    description: "AI-powered real estate media SaaS platform",
+    description: "AI-powered real estate media SaaS",
     period: "Mar 2025 - Present",
     startDate: "2025-03-01",
     highlights: [
       "Full-stack Rails 8 SaaS platform automating photo editing and video content creation for real estate professionals",
-      "Automated video generation engine that transforms property images into dynamic video slideshows, leveraging AI for textual content",
-      "Scheduling system for regular, automated video creation (daily, weekly, monthly) based on brand settings and video templates",
-      "Multi-stage review and approval workflow for video elements (text overlays, captions/hashtags) ensuring user control",
+      "Automated video generation engine transforming property images into dynamic video slideshows using AI",
+      "Scheduling system for regular, automated video creation based on brand settings and video templates",
+      "Multi-stage review and approval workflow for video elements ensuring user control",
       "Team accounts with multiple properties per account support",
       "Stripe integration for recurring and one-time payments",
       "Self-hosted on Hetzner VPS with Docker"
     ],
-    tags: ["Rails 8", "AI", "SaaS", "Stripe", "Hotwire"]
+    tags: ["Rails 8", "AI", "SaaS", "Stripe"]
+  },
+  {
+    id: "kawibot",
+    name: "Kawibot",
+    url: "https://kawibot.com",
+    description: "AI for energy audits",
+    period: "2025 - Present",
+    startDate: "2025-01-01",
+    highlights: [
+      "AI-powered platform automating energy audits - data collection, engineering math, and report writing",
+      "KawiLens: Field data collection with offline mode for basement walkthroughs, OCR for equipment nameplates",
+      "Baseline: Bill ingestion engine with auto-extraction and regression baseline generation",
+      "Workbench: Physics-based ECM selection and financial analysis (ROI, payback, NPV)",
+      "Reporter: AI-generated technical reports in ASHRAE/ISO formats with chart embedding",
+      "Team of 5 engineers building product across web, mobile, and AI integrations"
+    ],
+    tags: ["AI", "Energy", "SaaS", "Rails"]
+  },
+  {
+    id: "anywaye",
+    name: "Anywaye",
+    url: "https://anywaye.com",
+    description: "The ChatGPT for your product",
+    period: "2026 - Present",
+    startDate: "2026-01-01",
+    highlights: [
+      "Enterprise AI agent platform - build agents that connect to your APIs and talk to your software",
+      "Studio: No-code agent builder with natural language configuration",
+      "Brain: Intelligence layer parsing intent, orchestrating multi-API calls, dynamic computation",
+      "Chat: Conversational UI with rich media, inline transactions, and channel deployment",
+      "Patterns: Usage analytics with AI-powered feature recommendations",
+      "Auto-routing across GPT-4, Claude, and Gemini models for optimal cost/quality"
+    ],
+    tags: ["AI Agents", "Enterprise", "SaaS", "Rails"]
   },
   {
     id: "autohaven",
     name: "Autohaven",
     url: "https://autohaven.io",
     description: "Online car community network",
-    period: "Apr 2024 - Mar 2025",
+    period: "2024 - 2025",
     startDate: "2024-04-01",
     highlights: [
-      "Online car community with follow/unfollow, posts, comments and likes - grew to 700 users and 500 posts",
-      "2 automotive AI assistants (General + Audi) answering car-related questions via messaging and conversation",
-      "Internal newsletter subscription system grown to 500 subscribers, sent over 2k emails",
+      "Online car community with follow/unfollow, posts, comments and likes - grew to 700 users",
+      "2 automotive AI assistants (General + Audi) answering car-related questions via conversation",
+      "Newsletter system grown to 500 subscribers, sent over 2k emails",
       "Articles feature with 43 articles averaging 40 readers",
       "Complex data schema storing 100k+ car-related records from different car data APIs",
-      "Programmatic SEO generating 100k+ web pages indexed by Google",
-      "Processed 500k+ background jobs with SolidQueue"
+      "Programmatic SEO generating 100k+ web pages indexed by Google"
     ],
-    tags: ["Community", "AI", "SEO", "Rails", "Hotwire"]
+    tags: ["Community", "AI", "SEO", "Rails"]
+  },
+  {
+    id: "cafaye",
+    name: "Cafaye",
+    url: "https://cafaye.com",
+    description: "Agent-led publishing platform",
+    period: "2026 - Present",
+    startDate: "2026-01-01",
+    highlights: [
+      "Platform for building and publishing books with AI agents while keeping human accountability",
+      "Agent registration and book publishing workflow",
+      "Royalty tracking and payment automation",
+      "Reader analytics and engagement metrics",
+      "Integration with X/Twitter for author discovery"
+    ],
+    tags: ["Publishing", "AI Agents", "SaaS", "Rails"]
+  },
+  {
+    id: "runbox",
+    name: "Runbox",
+    url: "https://github.com/kaka-ruto/runbox",
+    description: "API for running code in containers",
+    period: "2026 - Present",
+    startDate: "2026-01-01",
+    highlights: [
+      "Fast, secure API for running code in isolated Docker containers",
+      "Per-identifier persistent containers for instant repeat executions",
+      "Multi-language support: Python, Ruby, Shell out of the box",
+      "Configurable timeouts, memory limits, and network policies per request",
+      "Automatic cleanup of idle containers",
+      "Environment introspection - get OS, runtime, and package info before running code"
+    ],
+    tags: ["DevTools", "API", "Docker", "Python"]
+  },
+  {
+    id: "solid_events",
+    name: "SolidEvents",
+    url: "https://github.com/kaka-ruto/solid_events",
+    description: "Context Graph for Rails",
+    period: "2026 - Present",
+    startDate: "2026-01-01",
+    highlights: [
+      "Zero-config, database-backed observability engine for Rails 8+",
+      "Auto-instrumentation: captures Controller actions, Active Jobs, and SQL queries",
+      "Auto-linking: automatically links ActiveRecord creates/updates to traces",
+      "Auto-labeling: maps controller actions to business terms",
+      "Context scraping: automatically detects current_user, current_account",
+      "Tail sampling: keeps all failures/slow traces, samples the rest",
+      "Dashboard with live tail, trace waterfall, entity search, and incident lifecycle"
+    ],
+    tags: ["Observability", "Rails", "Gem", "Ruby"]
+  },
+  {
+    id: "solid_agents",
+    name: "SolidAgents",
+    url: "https://github.com/kaka-ruto/solid_agents",
+    description: "Event-driven error fixing workflow",
+    period: "2026 - Present",
+    startDate: "2026-01-01",
+    highlights: [
+      "Event-driven error fixing workflow for Rails apps, powered by RubyLLM agents",
+      "Pipeline: error received -> staged agent workflow -> code fix attempt -> PR/CI tracking",
+      "DB-backed run lifecycle and stage workflow with actor attribution",
+      "Work-item board columns driven by stage transitions",
+      "Handoff records between stage owners (alex, betty, chad, david, eddy)",
+      "Built-in UI for runs, events, and artifacts"
+    ],
+    tags: ["AI Agents", "Rails", "Gem", "Ruby"]
+  },
+  {
+    id: "cleo",
+    name: "Cleo",
+    url: "https://github.com/kaka-ruto/cleo",
+    description: "Workflow CLI for shipping code",
+    period: "2026 - Present",
+    startDate: "2026-01-01",
+    highlights: [
+      "Workflow CLI that standardizes how humans and coding agents ship code, from PR to release",
+      "pr: PR operations with safety checks, merge gating, check inspection",
+      "qa: Full QA sessions from scaffold to final report with acceptance criteria",
+      "task: Track and execute follow-up work identified by QA/review",
+      "skill: Resolve, manage, install, validate, and customize agent skills",
+      "release: Deterministic release lifecycle with changelog assembly",
+      "cost: Engineering cost estimation using codebase metrics"
+    ],
+    tags: ["DevTools", "CLI", "Go", "Workflow"]
+  },
+  {
+    id: "timeline",
+    name: "Timeline",
+    url: "https://github.com/kaka-ruto/timeline",
+    description: "This portfolio website",
+    period: "2026 - Present",
+    startDate: "2026-01-01",
+    highlights: [
+      "Personal portfolio built with Astro + TailwindCSS",
+      "Twitter-inspired layout: left rail, center timeline, right context panel",
+      "Responsive design with mobile bottom nav",
+      "Resume-driven content with profile media",
+      "Dynamic right pane with Now status and GitHub activity",
+      "Deployed on Cloudflare Pages at kakaruto.com"
+    ],
+    tags: ["Portfolio", "Astro", "Tailwind", "Cloudflare"]
   }
 ];
 
