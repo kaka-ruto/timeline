@@ -61,17 +61,4 @@ const writing = defineCollection({
   })
 });
 
-const feed = defineCollection({
-  loader: glob({ base: "./src/user/data/feed", pattern: "**/*.md" }),
-  schema: z.object({
-    kind: z.string(),
-    title: z.string(),
-    summary: z.string(),
-    date: z.string(),
-    cta: z.string(),
-    href: z.string(),
-    tags: z.array(z.string()).default([])
-  })
-});
-
-export const collections = { "builder-log": builderLog, work, projects, writing, feed };
+export const collections = { "builder-log": builderLog, work, projects, writing };
