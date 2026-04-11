@@ -2,8 +2,8 @@
 name: solid_events
 url: https://github.com/kaka-ruto/solid_events
 description: Zero-config observability engine for Rails 8+
-period: Oct 2025 - Present
-startDate: '2025/10/01'
+period: Jan 2026 - Present
+startDate: '2026/01/01'
 tags:
   - Rails 8
   - Observability

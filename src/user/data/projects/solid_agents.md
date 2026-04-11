@@ -2,8 +2,8 @@
 name: solid_agents
 url: https://github.com/kaka-ruto/solid_agents
 description: Event-driven error fixing workflow for Rails
-period: Aug 2025 - Present
-startDate: '2025/08/01'
+period: Jan 2026 - Present
+startDate: '2026/01/01'
 tags:
   - Ruby
   - AI

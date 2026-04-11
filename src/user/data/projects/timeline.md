@@ -2,8 +2,8 @@
 name: timeline
 url: https://github.com/kaka-ruto/timeline
 description: Personal portfolio website built with Astro + TailwindCSS
-period: 2024 - Present
-startDate: '2024/01/01'
+period: Jan 2026 - Present
+startDate: '2026/01/01'
 tags:
   - Astro
   - TailwindCSS

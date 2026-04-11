@@ -2,8 +2,8 @@
 name: cleo
 url: https://github.com/kaka-ruto/cleo
 description: Go CLI workflow tool for engineering teams
-period: 2024 - Present
-startDate: '2024/01/01'
+period: Jan 2026 - Present
+startDate: '2026/01/01'
 tags:
   - Go
   - CLI
