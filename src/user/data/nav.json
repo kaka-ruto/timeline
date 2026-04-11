@@ -3,6 +3,6 @@
   { "label": "Work", "href": "/work" },
   { "label": "Projects", "href": "/projects" },
   { "label": "Writing", "href": "/writing" },
-  { "label": "Contact", "href": "/contact" },
+  { "label": "Activity", "href": "/activity" },
   { "label": "Customize", "href": "/customize", "desktopOnly": true }
 ]
