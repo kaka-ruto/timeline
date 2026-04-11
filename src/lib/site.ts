@@ -2,10 +2,6 @@ import profile from "../user/data/profile.json";
 import navItems from "../user/data/nav.json";
 import githubConfig from "../user/data/github.json";
 import builderLogConfig from "../user/data/builder-log.json";
-import feedItems from "../user/data/feed.json";
-import writings from "../user/data/writings.json";
-import workHistory from "../user/data/work.json";
-import projects from "../user/data/projects.json";
 
 export type NavItem = {
   label: string;
@@ -53,7 +49,7 @@ export type Project = {
   tags: string[];
 };
 
-export { profile, navItems, githubConfig, builderLogConfig, feedItems, writings, workHistory, projects };
+export { profile, navItems, githubConfig, builderLogConfig };
 
 export const pageMeta = {
   homeTitle: `${profile.name} | Portfolio`,
