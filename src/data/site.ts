@@ -25,7 +25,7 @@ export const profile = {
   website: "https://kakaruto.com",
   github: "https://github.com/kaka-ruto",
   linkedin: "https://www.linkedin.com/in/kakaruto/",
-  x: "https://x.com/kakaruto"
+  x: "https://x.com/kakaruto_ruto"
 };
 
 export const navItems: NavItem[] = [
