@@ -7,29 +7,10 @@ const sortedWritings = writingEntries.sort((a, b) =>
   new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
 );
 
-const dayParts = (value: Date) => {
-  const parts = String(value).split(/[-T]/).map((part, i) => ({
-    type: (["year", "month", "day", "time"][i] ?? "time") as string,
-    value: part.split(" ")[0]
-  }));
-  return {
-    year: Number(parts.find((part) => part.type === "year")?.value ?? "0"),
-    month: Number(parts.find((part) => part.type === "month")?.value ?? "0"),
-    day: Number(parts.find((part) => part.type === "day")?.value ?? "0")
-  };
-};
-
-const daysAgoText = (value: string) => {
-  if (!value || !value.includes("/")) return value;
-  const nowParts = dayParts(new Date());
-  const parts = value.split("/").map(Number);
-  const year = parts[0];
-  const month = parts[1];
-  const day = parts[2];
-  if (!year || !month || !day) return value;
-  const nowUtc = Date.UTC(nowParts.year, nowParts.month - 1, nowParts.day);
-  const entryUtc = Date.UTC(year, month - 1, day);
-  const diff = Math.max(0, Math.floor((nowUtc - entryUtc) / 86400000));
+const daysAgoText = (value: Date | string) => {
+  const now = new Date();
+  const then = new Date(value);
+  const diff = Math.max(0, Math.floor((now.getTime() - then.getTime()) / 86400000));
   if (diff === 0) return "today";
   if (diff === 1) return "1 day ago";
   if (diff < 30) return `${diff} days ago`;
