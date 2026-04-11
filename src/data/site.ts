@@ -98,6 +98,26 @@ export const feedItems: FeedItem[] = [
   }
 ];
 
+export type Writing = {
+  id: string;
+  title: string;
+  url: string;
+  summary: string;
+  date: string;
+  tags: string[];
+};
+
+export const writings: Writing[] = [
+  {
+    id: "product-engineering",
+    title: "How I approach product engineering in early-stage startups",
+    url: "/writing",
+    summary: "A practical breakdown of shipping fast while protecting product quality and user trust.",
+    date: "2026-03-01",
+    tags: ["Product", "Startups", "Engineering"]
+  }
+];
+
 export type WorkExperience = {
   id: string;
   company: string;
