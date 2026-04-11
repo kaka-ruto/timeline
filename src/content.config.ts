@@ -27,4 +27,38 @@ const builderLog = defineCollection({
   })
 });
 
-export const collections = { "builder-log": builderLog };
+const work = defineCollection({
+  loader: glob({ base: "./src/user/data/work", pattern: "**/*.md" }),
+  schema: z.object({
+    company: z.string(),
+    role: z.string(),
+    location: z.string(),
+    period: z.string(),
+    startDate: z.string()
+  })
+});
+
+const projects = defineCollection({
+  loader: glob({ base: "./src/user/data/projects", pattern: "**/*.md" }),
+  schema: z.object({
+    name: z.string(),
+    url: z.string(),
+    description: z.string(),
+    period: z.string(),
+    startDate: z.string(),
+    tags: z.array(z.string()).default([])
+  })
+});
+
+const writing = defineCollection({
+  loader: glob({ base: "./src/user/data/writing", pattern: "**/*.md" }),
+  schema: z.object({
+    title: z.string(),
+    url: z.string(),
+    summary: z.string(),
+    date: z.string(),
+    tags: z.array(z.string()).default([])
+  })
+});
+
+export const collections = { "builder-log": builderLog, work, projects, writing };
