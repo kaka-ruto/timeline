@@ -6,17 +6,6 @@ const projectEntries = await getCollection("projects");
 const sortedProjects = projectEntries.sort((a, b) => 
   new Date(b.data.startDate).getTime() - new Date(a.data.startDate).getTime()
 );
-
-const daysAgoText = (value: Date | string) => {
-  const now = new Date();
-  const then = new Date(value);
-  const diff = Math.max(0, Math.floor((now.getTime() - then.getTime()) / 86400000));
-  if (diff === 0) return "today";
-  if (diff === 1) return "1 day ago";
-  if (diff < 30) return `${diff} days ago`;
-  if (diff < 365) return `${Math.floor(diff / 30)} months ago`;
-  return `${Math.floor(diff / 365)} years ago`;
-};
 ---
 
 <AppShell activePath="/projects" pageTitle="Projects | Kaka Ruto" pageDescription="Projects by Kaka Ruto.">
@@ -31,7 +20,7 @@ const daysAgoText = (value: Date | string) => {
         <div class:list={["px-5 py-5", i < sortedProjects.length - 1 && "border-b border-zinc-800"]}>
           <div class="flex items-baseline justify-between gap-x-4">
             <a href={entry.data.url} target="_blank" rel="noreferrer" class="text-base font-semibold text-blue-400">{entry.data.name}</a>
-            <div class="text-sm text-emerald-400 shrink-0">{daysAgoText(entry.data.startDate)}</div>
+            <div class="text-sm text-emerald-400 shrink-0">{entry.data.period}</div>
           </div>
           <p class="mt-1 text-sm font-medium text-zinc-200">{entry.data.description}</p>
           
