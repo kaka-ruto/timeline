@@ -1,6 +1,6 @@
 ---
 import AppShell from "../../layouts/AppShell.astro";
-import { workHistory } from "../../data/site";
+import { workHistory } from "../../user/site";
 
 const sortedHistory = [...workHistory].sort((a, b) => 
   new Date(b.startDate).getTime() - new Date(a.startDate).getTime()

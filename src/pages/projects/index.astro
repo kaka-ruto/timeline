@@ -1,6 +1,6 @@
 ---
 import AppShell from "../../layouts/AppShell.astro";
-import { projects } from "../../data/site";
+import { projects } from "../../user/site";
 
 const sortedProjects = [...projects].sort((a, b) => 
   new Date(b.startDate).getTime() - new Date(a.startDate).getTime()

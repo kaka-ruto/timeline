@@ -2,7 +2,7 @@ import { glob } from "astro/loaders";
 import { defineCollection, z } from "astro:content";
 
 const builderLog = defineCollection({
-  loader: glob({ base: "./src/content/builder-log", pattern: "**/*.md" }),
+  loader: glob({ base: "./src/user/content/builder-log", pattern: "**/*.md" }),
   schema: z.object({
     date: z.coerce.date(),
     contributionsTotal: z.number().int().min(0).optional(),

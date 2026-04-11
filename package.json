@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "dev:pages": "npm run build && npx -y wrangler@3.90.0 pages dev dist",
+    "init:user": "node scripts/init-user.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"

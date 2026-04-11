@@ -131,7 +131,7 @@ const tokenFromDevVars = (root) => {
 };
 
 const readSiteConfig = (root) => {
-  const filePath = path.join(root, "src", "data", "site.ts");
+  const filePath = path.join(root, "src", "user", "site.ts");
   const contents = fs.readFileSync(filePath, "utf8");
 
   const usernameMatch = contents.match(/githubConfig\s*=\s*\{[\s\S]*?username:\s*"([^"]+)"/m);
@@ -314,8 +314,8 @@ const main = async () => {
   const username = options.username ?? siteConfig.username;
   const timeZone = options.timeZone ?? siteConfig.timeZone;
 
-  if (!username) throw new Error("Missing GitHub username. Pass --username or set src/data/site.ts githubConfig.username.");
-  if (!timeZone) throw new Error("Missing time zone. Pass --timezone or set src/data/site.ts builderLogConfig.timeZone.");
+  if (!username) throw new Error("Missing GitHub username. Pass --username or set src/user/site.ts githubConfig.username.");
+  if (!timeZone) throw new Error("Missing time zone. Pass --timezone or set src/user/site.ts builderLogConfig.timeZone.");
 
   const hours = normalizeHours(options.hours);
   if (hours && options.date) throw new Error("Use either --date or --hours, not both.");

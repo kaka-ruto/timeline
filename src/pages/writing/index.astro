@@ -1,6 +1,6 @@
 ---
 import AppShell from "../../layouts/AppShell.astro";
-import { writings } from "../../data/site";
+import { writings } from "../../user/site";
 
 const sortedWritings = [...writings].sort((a, b) => 
   new Date(b.date).getTime() - new Date(a.date).getTime()
