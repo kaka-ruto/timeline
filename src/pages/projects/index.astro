@@ -18,11 +18,9 @@ const sortedProjects = projectEntries.sort((a, b) =>
     <div class="-mx-5">
       {sortedProjects.map((entry, i) => (
         <div class:list={["px-5 py-5", i < sortedProjects.length - 1 && "border-b border-zinc-800"]}>
-          <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <div class="flex items-baseline gap-3">
-              <a href={entry.data.url} target="_blank" rel="noreferrer" class="text-base font-semibold text-blue-400">{entry.data.name}</a>
-            </div>
-            <div class="text-sm text-emerald-400">{entry.data.period}</div>
+          <div class="flex items-baseline justify-between gap-x-4">
+            <a href={entry.data.url} target="_blank" rel="noreferrer" class="text-base font-semibold text-blue-400">{entry.data.name}</a>
+            <div class="text-sm text-emerald-400 shrink-0">{entry.data.period}</div>
           </div>
           <p class="mt-1 text-sm font-medium text-zinc-200">{entry.data.description}</p>
           
