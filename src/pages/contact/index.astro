@@ -2,76 +2,44 @@
 import AppShell from "../../layouts/AppShell.astro";
 ---
 
-<AppShell activePath="/contact" pageTitle="Contact | Kaka Ruto" pageDescription="How to send a strong cold email to Kaka Ruto.">
+<AppShell activePath="/contact" pageTitle="Contact | Kaka Ruto" pageDescription="How to contact Kaka Ruto.">
   <section class="min-h-screen border-x border-zinc-800 bg-black/95 px-5 py-8 pb-20 lg:pb-8">
-    <div class="mx-auto max-w-2xl">
-      <h2 class="text-3xl font-black leading-tight text-zinc-50">Contact</h2>
-      <p class="mt-3 text-sm leading-6 text-zinc-300">
-        Knowing how to send a great cold email is a superpower. Also, if your email starts with
-        “Hope this finds you well,” it has already found the archive.
-      </p>
-
-      <div class="mt-6 rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
-        <h3 class="text-lg font-bold text-zinc-100">The best emails:</h3>
-        <ul class="mt-3 space-y-3 text-sm text-zinc-300">
-          <li>2-3 sentences, reads like a text.</li>
-          <li>Has one clear ask.</li>
-          <li>Thoughtfully personalized.</li>
-          <li>Punchy subject line.</li>
-          <li>Avoid vague asks like “pick your brain.”</li>
-          <li>Does not look like AI wrote it.</li>
-          <li>No signature.</li>
-        </ul>
-      </div>
-
-      <div class="mt-5 rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
-        <h3 class="text-lg font-bold text-zinc-100">Subject line examples</h3>
-        <ul class="mt-3 space-y-2 text-sm text-zinc-300">
-          <li>“Quick build collaboration idea”</li>
-          <li>“Can you help me ship this in 2 weeks?”</li>
-          <li>“Tiny ask on product architecture”</li>
-        </ul>
-      </div>
-
-      <div class="mt-5 rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
-        <h3 class="text-lg font-bold text-zinc-100">Mini template</h3>
-        <pre class="mt-3 overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-xs leading-6 text-zinc-300">Hi Kaka - [specific thing I noticed].
-
-I am working on [one-line context].
-Would you be open to [clear ask] this week?</pre>
-      </div>
-
-      <div class="mt-6 flex flex-wrap items-center gap-3">
-        <button id="copy-email" type="button" class="rounded-full bg-sky-500 px-5 py-2 text-sm font-semibold text-white hover:bg-sky-400">
-          Copy contact email
-        </button>
-        <a id="open-email" class="rounded-full border border-zinc-700 px-5 py-2 text-sm text-zinc-200 hover:border-zinc-500" href="#">
-          Open email app
+    <header class="border-b border-zinc-800 pb-6">
+      <h2 class="text-2xl font-bold text-zinc-50">Contact</h2>
+      <p class="mt-2 text-zinc-400">How to send a great cold email is a superpower.</p>
+    </header>
+    
+    <div class="border-b border-zinc-800 px-5 py-5">
+      <h3 class="text-lg font-bold text-zinc-100">The best emails:</h3>
+      <ul class="mt-3 space-y-2 text-sm text-zinc-300">
+        <li>2-3 sentences, reads like a text.</li>
+        <li>Has one clear ask.</li>
+        <li>Thoughtfully personalized.</li>
+        <li>Punchy subject line.</li>
+        <li>Avoid vague asks like "pick your brain."</li>
+        <li>Does not look like AI wrote it.</li>
+        <li>No signature.</li>
+      </ul>
+    </div>
+    
+    <div class="px-5 py-5">
+      <div class="flex flex-wrap items-center gap-3">
+        <a id="open-email" class="rounded-full bg-sky-500 px-5 py-2 text-sm font-semibold text-white hover:bg-sky-400" href="#">
+          Email me
         </a>
-        <p id="contact-status" class="text-sm text-zinc-400"></p>
       </div>
     </div>
-
+    
     <script is:inline>
       const emailParts = ["contact", "kakaruto", "com"];
       const email = emailParts.join(".");
       const contactEmail = email.replace(".", "@").replace(".com", ".com");
-
-      const status = document.getElementById("contact-status");
       const openEmail = document.getElementById("open-email");
       const subject = encodeURIComponent("Quick idea");
-      const body = encodeURIComponent("Hi Kaka -\\n\\n[Your short, clear message here]\\n");
-
+      const body = encodeURIComponent("Hi Kaka -\n\n[Your short, clear message here]\n");
       openEmail?.setAttribute("href", `mailto:${contactEmail}?subject=${subject}&body=${body}`);
-
-      document.getElementById("copy-email")?.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(contactEmail);
-          status.textContent = `Copied ${contactEmail}`;
-        } catch {
-          status.textContent = `Email: ${contactEmail}`;
-        }
-      });
     </script>
+    
+    
   </section>
 </AppShell>
