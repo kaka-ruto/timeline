@@ -110,43 +110,6 @@ export type WorkExperience = {
 
 export const workHistory: WorkExperience[] = [
   {
-    id: "4ditor",
-    company: "4ditor",
-    location: "Liverpool, UK",
-    role: "Creator",
-    period: "Mar 2025 - Present",
-    startDate: "2025-03-01",
-    highlights: [
-      "Created 4ditor, a fullstack AI-powered SaaS platform, automating photo editing and video content creation for real estate professionals, using Rails 8",
-      "Built an automated video generation engine that transforms property images into dynamic video slideshows, leveraging AI for textual content",
-      "Designed a scheduling system for users to set up regular, automated video creation (daily, weekly, monthly) based on their brand settings",
-      "Integrated multiple AI models to support both advanced image editing capabilities and the generation of content for videos",
-      "Implemented a multi-stage review and approval workflow for video elements, ensuring user control and content quality",
-      "Engineered the platform to support team accounts and to manage multiple properties per account",
-      "Supported recurring and one-time payments securely using Stripe",
-      "Self-hosted the app on a Hetzner VPS, deployed with docker",
-      "Led product discovery and strategy, full-stack development, and iterative feature rollouts"
-    ]
-  },
-  {
-    id: "autohaven",
-    company: "Autohaven",
-    location: "Liverpool, UK",
-    role: "Creator",
-    period: "Apr 2024 - Mar 2025",
-    startDate: "2024-04-01",
-    highlights: [
-      "Built an online car community network with the ability to follow/unfollow accounts, make posts, get comments and likes and grew it to 700 users and 500 posts",
-      "Created 2 automotive AI assistants that use AI to answer car-related questions via messaging and conversation interface",
-      "Built an internal newsletter subscription and emailing system and grew it to 500 subscribers and sent over 2k emails",
-      "Built an articles feature that saw 43 articles being written with an average of 40 readers",
-      "Generated a complex data schema that stored over 100k car-related records from different car data APIs",
-      "Used programmatic SEO to generate over 100k web pages that got indexed by Google",
-      "Processed about 500k background jobs with SolidQueue",
-      "Managed 2 engineering interns, a technical writer and 2 marketers"
-    ]
-  },
-  {
     id: "smartpension",
     company: "SmartPension",
     location: "London, UK",
@@ -246,6 +209,56 @@ export const workHistory: WorkExperience[] = [
     highlights: [
       "Worked on an internal product and with two of Andela's clients - Gobble(US) and Boatflex(Denmark)"
     ]
+  }
+];
+
+export type Project = {
+  id: string;
+  name: string;
+  url: string;
+  description: string;
+  period: string;
+  startDate: string;
+  highlights: string[];
+  tags: string[];
+};
+
+export const projects: Project[] = [
+  {
+    id: "4ditor",
+    name: "4ditor",
+    url: "https://4ditor.com",
+    description: "AI-powered real estate media SaaS platform",
+    period: "Mar 2025 - Present",
+    startDate: "2025-03-01",
+    highlights: [
+      "Full-stack Rails 8 SaaS platform automating photo editing and video content creation for real estate professionals",
+      "Automated video generation engine that transforms property images into dynamic video slideshows, leveraging AI for textual content",
+      "Scheduling system for regular, automated video creation (daily, weekly, monthly) based on brand settings and video templates",
+      "Multi-stage review and approval workflow for video elements (text overlays, captions/hashtags) ensuring user control",
+      "Team accounts with multiple properties per account support",
+      "Stripe integration for recurring and one-time payments",
+      "Self-hosted on Hetzner VPS with Docker"
+    ],
+    tags: ["Rails 8", "AI", "SaaS", "Stripe", "Hotwire"]
+  },
+  {
+    id: "autohaven",
+    name: "Autohaven",
+    url: "https://autohaven.io",
+    description: "Online car community network",
+    period: "Apr 2024 - Mar 2025",
+    startDate: "2024-04-01",
+    highlights: [
+      "Online car community with follow/unfollow, posts, comments and likes - grew to 700 users and 500 posts",
+      "2 automotive AI assistants (General + Audi) answering car-related questions via messaging and conversation",
+      "Internal newsletter subscription system grown to 500 subscribers, sent over 2k emails",
+      "Articles feature with 43 articles averaging 40 readers",
+      "Complex data schema storing 100k+ car-related records from different car data APIs",
+      "Programmatic SEO generating 100k+ web pages indexed by Google",
+      "Processed 500k+ background jobs with SolidQueue"
+    ],
+    tags: ["Community", "AI", "SEO", "Rails", "Hotwire"]
   }
 ];
 

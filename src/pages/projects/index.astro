@@ -1,11 +1,37 @@
 ---
-import FeedPane from "../../components/FeedPane.astro";
 import AppShell from "../../layouts/AppShell.astro";
-import { feedItems } from "../../data/site";
+import { projects } from "../../data/site";
 
-const projects = feedItems.filter((item) => item.kind === "project");
+const sortedProjects = [...projects].sort((a, b) => 
+  new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+);
 ---
 
-<AppShell activePath="/projects" pageTitle="Projects | Kaka Ruto" pageDescription="Project timeline and case studies by Kaka Ruto.">
-  <FeedPane title="Projects" subtitle="Products and systems I have built" items={projects} />
+<AppShell activePath="/projects" pageTitle="Projects | Kaka Ruto" pageDescription="Projects and products built by Kaka Ruto.">
+  <section class="min-h-screen border-x border-zinc-800 bg-black/95 px-5 py-8 pb-20 lg:pb-8">
+    <header class="border-b border-zinc-800 pb-6">
+      <h2 class="text-2xl font-bold text-zinc-50">Projects</h2>
+      <p class="mt-2 text-zinc-400">Products and systems I have built.</p>
+    </header>
+    
+    <div class="-mx-5">
+      {sortedProjects.map((project, i) => (
+        <div class:list={["px-5 py-5", i < sortedProjects.length - 1 && "border-b border-zinc-800"]}>
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <div class="flex items-baseline gap-3">
+              <a href={project.url} target="_blank" rel="noreferrer" class="text-base font-semibold text-sky-400">{project.name}</a>
+            </div>
+            <div class="text-sm text-zinc-500">{project.period}</div>
+          </div>
+          <p class="mt-1 text-sm text-zinc-400">{project.description}</p>
+          
+          <ul class="mt-3 space-y-1.5">
+            {project.highlights.slice(0, 3).map((highlight) => (
+              <li class="text-sm leading-relaxed text-zinc-400">{highlight}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
 </AppShell>
