@@ -3,5 +3,5 @@ compatibility_date = "2026-03-29"
 pages_build_output_dir = "dist"
 
 [vars]
-CONTACT_FORWARD_TO = "contact@kakaruto.com"
-CONTACT_FROM = "contact.form@kakaruto.com"
+CONTACT_FORWARD_TO = "contact@mundeimmaculate.vercel.app"
+CONTACT_FROM = "contact.form@mundeimmaculate.vercel.app"

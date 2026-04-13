@@ -17,10 +17,37 @@ const { activePath, pageTitle, pageDescription } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <script is:inline>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        return 'light';
+      })();
+    
+      if (theme === 'light') {
+        document.documentElement.classList.add('light');
+      } else {
+        document.documentElement.classList.remove('light');
+      }
+    </script>
   </head>
   <body class="bg-black text-zinc-50 antialiased">
     <div class="mx-auto grid min-h-screen max-w-7xl lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_340px]">
-      <LeftPane activePath={activePath} />
+      <div class="relative">
+        <LeftPane activePath={activePath} />
+        <button id="theme-toggle" class="absolute bottom-6 right-6 z-50 hidden h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-black text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 lg:flex" aria-label="Toggle theme">
+          <svg id="sun-icon" class="hidden h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
+          </svg>
+          <svg id="moon-icon" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+      </div>
       <main>
         <header class="border-b border-zinc-800 px-4 py-4 lg:hidden">
           <div class="flex items-center justify-between gap-3">
@@ -32,18 +59,28 @@ const { activePath, pageTitle, pageDescription } = Astro.props;
                 <p class="text-xs text-zinc-400">{profile.role}</p>
               </div>
             </div>
-            <div class="relative">
-              <button id="menu-toggle" class="flex h-10 w-10 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100" aria-label="Menu">
-                <svg id="menu-icon" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            <div class="flex items-center gap-2">
+              <button id="theme-toggle-mobile" class="flex h-10 w-10 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100" aria-label="Toggle theme">
+                <svg id="sun-icon-mobile" class="hidden h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
                 </svg>
-                <svg id="close-icon" class="hidden h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                <svg id="moon-icon-mobile" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               </button>
-              <div id="menu-dropdown" class="absolute right-0 top-12 z-50 hidden w-48 rounded-xl border border-zinc-800 bg-zinc-950 p-2 shadow-xl">
-                <a href="/contact" class="block rounded-lg px-4 py-3 text-sm font-medium text-zinc-300 hover:bg-zinc-900 hover:text-zinc-100">Contact</a>
-                <a href="/customize" class="block rounded-lg px-4 py-3 text-sm font-medium text-zinc-300 hover:bg-zinc-900 hover:text-zinc-100">Customize</a>
+              <div class="relative">
+                <button id="menu-toggle" class="flex h-10 w-10 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100" aria-label="Menu">
+                  <svg id="menu-icon" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                  <svg id="close-icon" class="hidden h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <div id="menu-dropdown" class="absolute right-0 top-12 z-50 hidden w-48 rounded-xl border border-zinc-800 bg-zinc-950 p-2 shadow-xl">
+                  <a href="/contact" class="block rounded-lg px-4 py-3 text-sm font-medium text-zinc-300 hover:bg-zinc-900 hover:text-zinc-100">Contact</a>
+                  <a href="/customize" class="block rounded-lg px-4 py-3 text-sm font-medium text-zinc-300 hover:bg-zinc-900 hover:text-zinc-100">Customize</a>
+                </div>
               </div>
             </div>
           </div>
@@ -94,6 +131,43 @@ const { activePath, pageTitle, pageDescription } = Astro.props;
           }
         });
       }
+
+      // Theme toggle logic
+      const themeToggle = document.getElementById("theme-toggle");
+      const themeToggleMobile = document.getElementById("theme-toggle-mobile");
+      const sunIcon = document.getElementById("sun-icon");
+      const moonIcon = document.getElementById("moon-icon");
+      const sunIconMobile = document.getElementById("sun-icon-mobile");
+      const moonIconMobile = document.getElementById("moon-icon-mobile");
+
+      const updateIcons = (isLight) => {
+        if (isLight) {
+          sunIcon?.classList.add("hidden");
+          moonIcon?.classList.remove("hidden");
+          sunIconMobile?.classList.add("hidden");
+          moonIconMobile?.classList.remove("hidden");
+        } else {
+          sunIcon?.classList.remove("hidden");
+          moonIcon?.classList.add("hidden");
+          sunIconMobile?.classList.remove("hidden");
+          moonIconMobile?.classList.add("hidden");
+        }
+      };
+
+      const isLight = document.documentElement.classList.contains("light");
+      updateIcons(isLight);
+
+      const handleToggle = () => {
+        const element = document.documentElement;
+        element.classList.toggle("light");
+        
+        const isLight = element.classList.contains("light");
+        localStorage.setItem("theme", isLight ? "light" : "dark");
+        updateIcons(isLight);
+      };
+
+      themeToggle?.addEventListener("click", handleToggle);
+      themeToggleMobile?.addEventListener("click", handleToggle);
     </script>
   </body>
 </html>

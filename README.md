@@ -18,7 +18,7 @@ A personal portfolio website built with Astro + TailwindCSS, designed to resembl
 
 ## Demo
 
-See it live at [https://kakaruto.com](https://kakaruto.com)
+See it live at [https://mundeimmaculate.vercel.app](https://mundeimmaculate.vercel.app)
 
 ---
 
@@ -26,7 +26,7 @@ See it live at [https://kakaruto.com](https://kakaruto.com)
 
 ```bash
 # Clone the repository
-git clone https://github.com/kaka-ruto/timeline.git
+git clone https://github.com/immaculate-munde/timeline.git
 cd timeline
 
 # Install dependencies
@@ -256,7 +256,7 @@ npx wrangler pages deploy dist --project-name=timeline
 After deployment:
 
 1. Go to Cloudflare Dashboard > Pages > your project > Custom domains
-2. Add your domain (e.g., kakaruto.com)
+2. Add your domain (e.g., mundeimmaculate.vercel.app)
 3. Update your DNS at your domain registrar
 
 ---
