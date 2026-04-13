@@ -2,6 +2,7 @@
 
 :root {
   --accent: #1d9bf0;
+  color-scheme: dark light;
 }
 
 html,
@@ -9,6 +10,48 @@ body {
   margin: 0;
   min-height: 100%;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Base styles that respond to .light class */
+:root.light body {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+:root.light .bg-black {
+  background-color: #ffffff;
+}
+
+:root.light .bg-zinc-950 {
+  background-color: #f7f9f9;
+}
+
+:root.light .bg-zinc-900\/50 {
+  background-color: #f7f9f9;
+}
+
+:root.light .text-zinc-50,
+:root.light .text-zinc-100,
+:root.light .text-zinc-200 {
+  color: #0f1419;
+}
+
+:root.light .text-zinc-300,
+:root.light .text-zinc-400 {
+  color: #536471;
+}
+
+:root.light .border-zinc-800 {
+  border-color: #eff3f4;
+}
+
+:root.light .hover\:bg-zinc-900:hover {
+  background-color: #e7e7e8;
+}
+
+:root.light .bg-black\/95 {
+  background-color: rgba(255, 255, 255, 0.95);
 }
 
 a {
