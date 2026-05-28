@@ -333,14 +333,23 @@ const main = async () => {
 
   const headers = buildHeaders(token);
   const eventsUrl = `https://api.github.com/users/${encodeURIComponent(username)}/events?per_page=100`;
-  const response = await fetchWithRetry(eventsUrl, headers, 4);
 
-  if (!response.ok) {
-    const body = await response.text().catch(() => "");
-    throw new Error(`GitHub events fetch failed (${response.status}): ${body.slice(0, 200)}`);
+  // Try fetching events from GitHub, gracefully degrade on network failure.
+  let fetchError = null;
+  let events = [];
+  try {
+    const response = await fetchWithRetry(eventsUrl, headers, 4);
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      throw new Error(`GitHub events fetch failed (${response.status}): ${body.slice(0, 200)}`);
+    }
+    const allEvents = await response.json();
+    if (Array.isArray(allEvents)) events = allEvents;
+  } catch (err) {
+    fetchError = err?.cause?.code || err.message;
+    console.error(`GitHub fetch error (${fetchError}), writing zero-activity skeleton.`);
   }
 
-  const events = await response.json();
   const startMs = Date.parse(sinceUtc);
   const endMs = Date.parse(untilUtc);
 
@@ -403,7 +412,8 @@ const main = async () => {
         countsByRepo: repoCounts
       };
     })(),
-    events: inWindow
+    events: inWindow,
+    ...(fetchError ? { fetchError } : {})
   };
 
   // Enrich a limited number of events to provide the LLM with enough context.
