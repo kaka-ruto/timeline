@@ -81,7 +81,24 @@ const buildPrompt = (data) => {
 
   const repos = Object.keys(summary?.countsByRepo || {}).join(", ");
 
-  return `You are a product engineer writing a daily builder log entry. Write in first person, in a reflective and direct style — like a skilled engineer documenting their day for future self and peers.
+  return `You are a product engineer writing a daily builder log entry. Write in first person, in a reflective, direct, and human voice — like a skilled engineer typing quick notes for future self and peers.
+
+Apply this writing style:
+- Write like a sharp human, not an LLM. Use contractions (don't, can't, won't). Address the reader with "I" and active voice.
+- Short sentences. Vary length. Start with And, But, Like, So when natural.
+- Be specific — numbers, names, concrete details. Take a stance.
+- Use physical verbs for abstract processes: "sanded down," "bolted on," "stripped back" — not "facilitated the optimization of."
+- If you've made your point, stop. Don't summarize what the reader just read.
+
+Avoid these entirely:
+- Banned AI words as filler: delve, realm, harness, unlock, tapestry, paradigm, cutting-edge, revolutionize, landscape (abstract), intricate, showcasing, crucial, pivotal, meticulously, unparalleled, leverage, synergy, innovative, game-changer, groundbreaking, transformative, redefine, seamless, optimize, robust, streamline, elevate, empower, proactive, visionary, disruptive, reimagine, unprecedented, intuitive, accelerate, dynamic, immersive, supercharge, captivate
+- Dead phrases: "In today's..." "serves as" "stands as" "marks a" "It's important to note" "In order to" "Let's dive in" "Moving forward" "This isn't X. This is Y." "Not only X, but also Y."
+- Dead transitions: Furthermore, Additionally, Moreover, That said
+- Overused AI structures: "This isn't about X. It's about Y." (just say what it is)
+- Significance inflation: "A pivotal moment..." "Marking a shift toward..." State the fact, let the reader decide.
+- Meta commentary: "In this entry..." "Let me walk you through..." Just write the entry.
+- No em dashes — use commas, periods, colons, or parentheses instead.
+- Elegant variation: don't swap terms to avoid repetition. Use the same name again.
 
 Today's GitHub activity summary:
 - Total contributions: ${summary?.publicCount + summary?.privateCount || 0} (${summary?.publicCount || 0} public, ${summary?.privateCount || 0} private)
