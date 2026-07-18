@@ -335,7 +335,6 @@ const main = async () => {
   const eventsUrl = `https://api.github.com/users/${encodeURIComponent(username)}/events?per_page=100`;
 
   // Try fetching events from GitHub, gracefully degrade on network failure.
-  let fetchError = null;
   let events = [];
   try {
     const response = await fetchWithRetry(eventsUrl, headers, 4);
@@ -346,8 +345,9 @@ const main = async () => {
     const allEvents = await response.json();
     if (Array.isArray(allEvents)) events = allEvents;
   } catch (err) {
-    fetchError = err?.cause?.code || err.message;
-    console.error(`GitHub fetch error (${fetchError}), writing zero-activity skeleton.`);
+    const errMsg = err?.cause?.code || err.message;
+    console.error(`GitHub fetch error (${errMsg}) — no output written.`);
+    process.exit(1);
   }
 
   const startMs = Date.parse(sinceUtc);
@@ -359,6 +359,12 @@ const main = async () => {
         return Number.isFinite(ts) && ts >= startMs && ts < endMs;
       })
     : [];
+
+  // Only write output when there is actual activity to report.
+  if (inWindow.length === 0) {
+    console.error("No events in window — no output written.");
+    return;
+  }
 
   const outDir = path.join(root, ".tmp");
   fs.mkdirSync(outDir, { recursive: true });
@@ -412,8 +418,7 @@ const main = async () => {
         countsByRepo: repoCounts
       };
     })(),
-    events: inWindow,
-    ...(fetchError ? { fetchError } : {})
+    events: inWindow
   };
 
   // Enrich a limited number of events to provide the LLM with enough context.

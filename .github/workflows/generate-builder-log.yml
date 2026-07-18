@@ -1,0 +1,47 @@
+name: Generate Daily Builder Log
+
+on:
+  schedule:
+    # 20:00 UTC = 23:00 Africa/Nairobi
+    - cron: '0 20 * * *'
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch GitHub activity
+        id: fetch
+        run: node scripts/fetch-github-day.mjs --username kaka-ruto --timezone Africa/Nairobi
+        env:
+          GITHUB_TOKEN: ${{ secrets.BUILDER_GITHUB_TOKEN }}
+
+      - name: Generate builder log entry
+        id: generate
+        run: node scripts/generate-builder-log.mjs
+        env:
+          OPENCODE_GO_API_KEY: ${{ secrets.OPENCODE_GO_API_KEY }}
+
+      - name: Commit and push
+        run: |
+          git config user.name "Kaka Ruto Bot"
+          git config user.email "bot@kakaruto.com"
+          git add src/user/content/builder-log/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add builder log entry for $(TZ=Africa/Nairobi date +%Y-%m-%d)"
+            git push
+          fi
