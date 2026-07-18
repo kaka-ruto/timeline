@@ -1,6 +1,6 @@
 ---
 title: How I approach product engineering in early-stage startups
-url: /writing
+url: /writing/product-engineering
 summary: A practical breakdown of shipping fast while protecting product quality.
 date: '2026/03/01'
 tags:
