@@ -4,7 +4,7 @@ import LeftPane from "../components/LeftPane.astro";
 import RightPane from "../components/RightPane.astro";
 import { navItems, profile } from "../lib/site";
 
-const { activePath, pageTitle, pageDescription } = Astro.props;
+const { activePath, pageTitle, pageDescription, image } = Astro.props;
 ---
 
 <html lang="en">
@@ -13,6 +13,18 @@ const { activePath, pageTitle, pageDescription } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={pageDescription} />
     <title>{pageTitle}</title>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:type" content="website" />
+    {image && <meta property="og:image" content={new URL(image, Astro.url).href} />}
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content={image ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    {image && <meta name="twitter:image" content={new URL(image, Astro.url).href} />}
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />

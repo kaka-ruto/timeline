@@ -14,7 +14,7 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 ---
 
-<AppShell activePath="/writing" pageTitle={`${entry.data.title} | Kaka Ruto`} pageDescription={entry.data.summary}>
+<AppShell activePath="/writing" pageTitle={`${entry.data.title} | Kaka Ruto`} pageDescription={entry.data.summary} image={entry.data.image}>
   <article class="min-h-screen border-x border-zinc-800 bg-black/95 px-5 py-8 pb-20 lg:pb-8">
     <header class="border-b border-zinc-800 pb-6">
       <a href="/writing" class="mb-4 inline-block text-sm text-sky-400 hover:text-sky-300">&larr; Back to writing</a>
