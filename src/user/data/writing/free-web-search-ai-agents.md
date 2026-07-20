@@ -10,6 +10,8 @@ tags:
   - Agents
 ---
 
+![Web search architecture diagram](/writing/free-web-search-hero.png)
+
 Your AI agent needs the web. It can write code, read files, run tests. But ask it "what happened in AI this week?" and it stares back at you.
 
 Search APIs exist. Google Custom Search, SerpAPI, Bing, Tavily. They work. But they cost money — $50 here, $75 there — and every query you send teaches someone else's model what your agent is doing.
