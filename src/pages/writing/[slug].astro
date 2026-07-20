@@ -17,12 +17,12 @@ const { Content } = await render(entry);
 <AppShell activePath="/writing" pageTitle={`${entry.data.title} | Kaka Ruto`} pageDescription={entry.data.summary} image={entry.data.image}>
   <article class="min-h-screen border-x border-zinc-800 bg-black/95 px-5 py-8 pb-20 lg:pb-8">
     <header class="border-b border-zinc-800 pb-6">
-      <a href="/writing" class="mb-4 inline-block text-sm text-sky-400 hover:text-sky-300">&larr; Back to writing</a>
+      <a href="/writing" class="mb-4 inline-block rounded-lg px-3 py-2 -ml-3 text-sm text-sky-400 hover:bg-zinc-900 hover:text-sky-300">&larr; Back to writing</a>
       <h1 class="mt-2 text-2xl font-bold text-zinc-50">{entry.data.title}</h1>
       <div class="mt-2 flex items-center gap-3 text-sm text-zinc-400">
         <time>{entry.data.date}</time>
         {entry.data.tags.length > 0 && (
-          <span class="flex items-center gap-2">
+          <span class="flex flex-wrap items-center gap-2">
             {entry.data.tags.map((tag) => (
               <span class="rounded-full bg-zinc-900 px-2.5 py-0.5 text-xs text-zinc-300">{tag}</span>
             ))}
@@ -42,7 +42,7 @@ const { Content } = await render(entry);
       </div>
     )}
 
-    <div class="content mt-8 max-w-none">
+    <div class="content mt-8">
       <Content />
     </div>
   </article>

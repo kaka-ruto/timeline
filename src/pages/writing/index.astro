@@ -28,14 +28,14 @@ const daysAgoText = (value: Date | string) => {
     
     <div class="-mx-5">
       {sortedWritings.map((entry, i) => (
-        <a href={entry.data.url} class:list={["group flex gap-4 px-5 py-5 transition hover:bg-zinc-900/50", i < sortedWritings.length - 1 && "border-b border-zinc-800"]}>
+        <a href={entry.data.url} class:list={["group flex flex-col gap-3 px-5 py-5 transition hover:bg-zinc-900/50 sm:flex-row sm:gap-4", i < sortedWritings.length - 1 && "border-b border-zinc-800"]}>
           {entry.data.image && (
             <div class="shrink-0">
               <img src={entry.data.image} alt="" class="h-20 w-28 rounded-lg border border-zinc-800 object-cover transition group-hover:border-zinc-500" />
             </div>
           )}
           <div class="min-w-0 flex-1">
-            <div class="flex items-baseline justify-between gap-x-4">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4">
               <h3 class="text-base font-semibold text-zinc-100 transition group-hover:text-sky-400">{entry.data.title}</h3>
               <time class="shrink-0 text-sm text-emerald-400">{daysAgoText(entry.data.date)}</time>
             </div>

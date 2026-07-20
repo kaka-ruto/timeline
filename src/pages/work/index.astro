@@ -18,11 +18,11 @@ const sortedHistory = workEntries.sort((a, b) =>
     <div class="-mx-5">
       {sortedHistory.map((entry, i) => (
         <div class:list={["px-5 py-5", i < sortedHistory.length - 1 && "border-b border-zinc-800"]}>
-          <div class="flex items-baseline gap-3">
+          <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h3 class="text-base font-semibold text-sky-400">{entry.data.company}</h3>
             <span class="text-zinc-200">- {entry.data.role}</span>
           </div>
-          <div class="mt-1 flex items-baseline justify-between">
+          <div class="mt-1 flex flex-wrap items-baseline justify-between gap-x-4">
             <p class="text-xs text-zinc-400">{entry.data.location}</p>
             <span class="text-xs text-emerald-400">{entry.data.period}</span>
           </div>

@@ -114,7 +114,7 @@ const sentenceFromHARL = (entry: BuilderLogItem) => {
                   data-gallery-index={String(imageIndex)}
                   data-gallery-title={entry.data.hook}
                 >
-                  <img src={imagePath} alt={entry.data.hook} class="h-44 w-full rounded-xl object-cover" loading="lazy" />
+                  <img src={imagePath} alt={entry.data.hook} class="max-h-44 w-full rounded-xl object-cover" loading="lazy" />
                 </button>
               ))}
             </div>

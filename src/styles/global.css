@@ -11,6 +11,10 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -18,24 +22,33 @@ a {
 
 /* Blog post content styling */
 .content {
+  max-width: 75ch;
+
   & h2 {
-    font-size: 1.25rem;
+    font-size: clamp(1.125rem, 5vw, 1.5rem);
     font-weight: 700;
     margin-top: 2.5rem;
     margin-bottom: 1rem;
     color: #f4f4f5;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
   & h3 {
-    font-size: 1.125rem;
+    font-size: clamp(1rem, 4vw, 1.25rem);
     font-weight: 700;
     margin-top: 2rem;
     margin-bottom: 0.75rem;
     color: #f4f4f5;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
   & p {
     color: #d4d4d8;
     line-height: 1.75;
     margin-bottom: 1rem;
+    font-size: clamp(0.9375rem, 3.5vw, 1rem);
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
   & p:last-child {
     margin-bottom: 0;
@@ -63,12 +76,14 @@ a {
     border-radius: 0.5rem;
     padding: 1rem;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     margin-bottom: 1rem;
   }
   & pre code {
     background: transparent;
     padding: 0;
     color: #e4e4e7;
+    font-size: 0.8125rem;
   }
   & ul, & ol {
     color: #d4d4d8;
@@ -77,6 +92,8 @@ a {
   }
   & li {
     color: #d4d4d8;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
   & hr {
     border-color: #27272a;
@@ -92,6 +109,9 @@ a {
     border-collapse: collapse;
     width: 100%;
     margin-bottom: 1rem;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   & th {
     border: 1px solid #3f3f46;
@@ -99,6 +119,7 @@ a {
     text-align: left;
     color: #f4f4f5;
     background-color: #18181b;
+    white-space: nowrap;
   }
   & td {
     border: 1px solid #3f3f46;
@@ -108,5 +129,6 @@ a {
   & img {
     border-radius: 0.5rem;
     border: 1px solid #27272a;
+    height: auto;
   }
 }
