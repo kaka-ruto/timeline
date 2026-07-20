@@ -30,6 +30,18 @@ const { Content } = await render(entry);
         )}
       </div>
     </header>
+
+    {entry.data.image && (
+      <div class="mt-8 -mx-5 sm:mx-0">
+        <img
+          src={entry.data.image}
+          alt=""
+          class="h-auto w-full rounded-none border-y border-zinc-800 object-cover sm:rounded-lg sm:border"
+          loading="eager"
+        />
+      </div>
+    )}
+
     <div class="content mt-8 max-w-none">
       <Content />
     </div>
