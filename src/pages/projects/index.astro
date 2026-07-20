@@ -26,7 +26,7 @@ const sortedProjects = projectEntries.sort((a, b) =>
           
           <ul class="mt-3 space-y-1.5">
             {entry.body.split("\n").filter(line => line.trim().startsWith("-")).slice(0, 3).map((line) => (
-              <li class="text-sm leading-relaxed text-zinc-400">{line.replace(/^-\s*/, "").trim()}</li>
+              <li class="text-sm leading-relaxed text-zinc-400 break-words">{line.replace(/^-\s*/, "").trim()}</li>
             ))}
           </ul>
         </div>

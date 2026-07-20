@@ -31,7 +31,7 @@ const daysAgoText = (value: Date | string) => {
         <a href={entry.data.url} class:list={["group flex flex-col gap-3 px-5 py-5 transition hover:bg-zinc-900/50 sm:flex-row sm:gap-4", i < sortedWritings.length - 1 && "border-b border-zinc-800"]}>
           {entry.data.image && (
             <div class="shrink-0">
-              <img src={entry.data.image} alt="" class="h-20 w-28 rounded-lg border border-zinc-800 object-cover transition group-hover:border-zinc-500" />
+              <img src={entry.data.image} alt="" class="h-20 w-full rounded-lg border border-zinc-800 object-cover transition group-hover:border-zinc-500 sm:w-28" />
             </div>
           )}
           <div class="min-w-0 flex-1">
