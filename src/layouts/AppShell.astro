@@ -18,13 +18,13 @@ const { activePath, pageTitle, pageDescription, image } = Astro.props;
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={pageDescription} />
     <meta property="og:type" content="website" />
-    {image && <meta property="og:image" content={new URL(image, Astro.url).href} />}
+    {image && <meta property="og:image" content={new URL(image, Astro.site).href} />}
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content={image ? "summary_large_image" : "summary"} />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={pageDescription} />
-    {image && <meta name="twitter:image" content={new URL(image, Astro.url).href} />}
+    {image && <meta name="twitter:image" content={new URL(image, Astro.site).href} />}
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
