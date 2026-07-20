@@ -57,7 +57,8 @@ const writing = defineCollection({
     url: z.string(),
     summary: z.string(),
     date: z.string(),
-    tags: z.array(z.string()).default([])
+    tags: z.array(z.string()).default([]),
+    image: z.string().optional()
   })
 });
 

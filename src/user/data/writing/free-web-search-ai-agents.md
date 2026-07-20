@@ -8,6 +8,7 @@ tags:
   - AI
   - MCP
   - Agents
+image: /writing/free-web-search-hero.png
 ---
 
 ![Web search architecture diagram](/writing/free-web-search-hero.png)
