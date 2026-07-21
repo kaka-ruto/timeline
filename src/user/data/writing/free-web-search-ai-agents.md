@@ -109,12 +109,30 @@ Here's what actually comes back:
 If you're using ask-agent, drop it in as a tool:
 
 ```ruby
+# Inline — quick scripts (still works)
 session = Ask::Agent::Session.new(
   model: "gpt-4o",
   tools: [Ask::Tools::WebSearch]
 )
 session.run("What are people saying about the new Ruby 4.0 types?")
 ```
+
+Or the recommended way — define an agent with `Ask::Agent::Definition`:
+
+```ruby
+# agents/research_bot/agent.rb
+class ResearchBot < Ask::Agent::Definition
+  model "gpt-4o"
+  tools Ask::Tools::WebSearch
+  instructions "You can search the web for current information."
+end
+```
+
+```sh
+askr run research_bot "Latest on Ruby 4.0 types?"
+```
+
+The `askr` CLI also lists, schedules, and scaffolds agents.
 
 The agent treats `WebSearch` like any other tool. It sees the results, picks out the relevant parts, and answers. No API costs.
 
