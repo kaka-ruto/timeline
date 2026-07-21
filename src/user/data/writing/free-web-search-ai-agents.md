@@ -136,6 +136,8 @@ The `askr` CLI also lists, schedules, and scaffolds agents.
 
 The agent treats `WebSearch` like any other tool. It sees the results, picks out the relevant parts, and answers. No API costs.
 
+See the [ask-rb Web Search guide](https://ask-rb.github.io/ask-docs/core/web-search) for the full API reference and configuration options.
+
 ### You use ZCode, Claude Code, or Cursor
 
 You don't write Ruby agents — you use an MCP client. Same SearXNG, different gateway.
@@ -175,6 +177,8 @@ claude mcp add ask-web-search-mcp -- ask-web-search-mcp
 
 Restart your editor. Your model now has an `ask_web_search` tool. It'll use it whenever it needs current info.
 
+See the [ask-rb Web Search guide](https://ask-rb.github.io/ask-docs/core/web-search) for more setup options and troubleshooting.
+
 ## How it all fits together
 
 ```
@@ -191,6 +195,6 @@ Every piece runs on your machine. No API keys, no monthly bills, no tracking.
 
 ## Where to go from here
 
-The [ask-web-search repo](https://github.com/ask-rb/ask-web-search) has the full Ruby API. The [ask-web-search-mcp repo](https://github.com/ask-rb/ask-web-search-mcp) covers the MCP server setup.
+The [ask-web-search repo](https://github.com/ask-rb/ask-web-search) has the full Ruby API. The [ask-web-search-mcp repo](https://github.com/ask-rb/ask-web-search-mcp) covers the MCP server setup. The [ask-rb docs](https://ask-rb.github.io/ask-docs/) tie everything together with guides and reference material.
 
 But really, the commands at the top of this post are all you need. Docker, gem install, config edit. Ten minutes and your agent can search the web — no API keys, no monthly bills, no tracking.
